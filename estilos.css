@@ -554,7 +554,7 @@ footer {
   background-color: var(--color-primario);
   justify-content: center;
   align-items: center;
-  position: fixed; /* Fija el footer al fondo de la página */
+  position: relative; 
   bottom: 0;
   z-index: 1000;
   gap: 30px;
