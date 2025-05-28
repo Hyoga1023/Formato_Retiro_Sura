@@ -134,7 +134,7 @@ document.addEventListener("DOMContentLoaded", () => {
   };
 
   /**
-   * Módulo de generación de PDF
+   * Módulo de generación de PDF mejorado - Sin cuadro negro
    */
   const PdfGenerator = {
     /**
@@ -157,11 +157,21 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         const { jsPDF } = window.jspdf;
         const pdf = new jsPDF("p", "pt", "a4");
-        const container = this._createPdfContainer();
         
-        document.body.appendChild(container);
-        const canvas = await this._captureCanvas(container);
-        document.body.removeChild(container);
+        // Ocultar temporalmente el botón de descarga
+        const downloadButton = document.querySelector(".contenedor-boton");
+        const originalDisplay = downloadButton ? downloadButton.style.display : null;
+        if (downloadButton) {
+          downloadButton.style.display = "none";
+        }
+
+        // Capturar directamente los elementos visibles
+        const canvas = await this._captureVisibleContent();
+        
+        // Restaurar el botón
+        if (downloadButton) {
+          downloadButton.style.display = originalDisplay || "";
+        }
 
         this._addImageToPdf(pdf, canvas);
         pdf.save("Formato_de_Retiro.pdf");
@@ -171,92 +181,136 @@ document.addEventListener("DOMContentLoaded", () => {
     },
 
     /**
-     * Crea el contenedor para el contenido del PDF
-     * @returns {HTMLElement} - Contenedor creado
-     */
-    _createPdfContainer() {
-      const container = document.createElement("div");
-      container.className = "pdf-container";
-      
-      // Estilos básicos para el contenedor PDF - mantiene el layout original
-      Object.assign(container.style, {
-        position: 'absolute',
-        top: '-9999px',
-        left: '0',
-        width: '100%',
-        maxWidth: 'none',
-        backgroundColor: 'white',
-        fontFamily: 'Sofia Sans, sans-serif',
-        padding: '0',
-        margin: '0'
-      });
-
-      // Clonar elementos manteniendo sus estilos originales
-      const headerClone = document.querySelector("header").cloneNode(true);
-      const mainClone = document.querySelector("main").cloneNode(true);
-
-      // Ocultar el botón de descarga en el PDF
-      const hideButton = mainClone.querySelector(".contenedor-boton");
-      if (hideButton) {
-        hideButton.style.display = "none";
-      }
-
-      // Crear un link temporal al CSS para que html2canvas lo capture
-      const linkElement = document.createElement('link');
-      linkElement.rel = 'stylesheet';
-      linkElement.href = './estilos.css'; // Ajusta la ruta según tu estructura
-      container.appendChild(linkElement);
-
-      container.append(headerClone, mainClone);
-      return container;
-    },
-
-    /**
-     * Captura el contenido como canvas
-     * @param {HTMLElement} container - Contenedor a capturar
+     * Captura el contenido visible directamente
      * @returns {Promise<HTMLCanvasElement>} - Canvas con la imagen
      */
-    async _captureCanvas(container) {
-      return await html2canvas(container, { 
-        scale: 1.5,
+    async _captureVisibleContent() {
+      // Seleccionar el contenido principal a capturar
+      const contentToCapture = document.body;
+      
+      return await html2canvas(contentToCapture, {
+        scale: 2, // Mejor calidad
         useCORS: true,
-        allowTaint: true,
-        backgroundColor: '#ffffff',
-        width: 794,
-        height: container.scrollHeight,
+        allowTaint: false,
+        backgroundColor: '#ffffff', // Fondo blanco sólido
         scrollX: 0,
-        scrollY: 0
+        scrollY: 0,
+        width: window.innerWidth,
+        height: document.body.scrollHeight,
+        windowWidth: window.innerWidth,
+        windowHeight: window.innerHeight,
+        logging: false,
+        removeContainer: true,
+        ignoreElements: (element) => {
+          // Ignorar elementos que pueden causar problemas
+          return element.classList.contains('no-pdf') || 
+                 element.tagName === 'SCRIPT' ||
+                 element.tagName === 'STYLE';
+        },
+        onclone: (clonedDoc, element) => {
+          // Asegurar fondos blancos en el documento clonado
+          const clonedBody = clonedDoc.body;
+          if (clonedBody) {
+            clonedBody.style.backgroundColor = '#ffffff';
+            clonedBody.style.background = '#ffffff';
+          }
+          
+          // Aplicar estilos adicionales para evitar transparencias
+          const allElements = clonedDoc.querySelectorAll('*');
+          allElements.forEach(el => {
+            const computedStyle = window.getComputedStyle(el);
+            if (computedStyle.backgroundColor === 'rgba(0, 0, 0, 0)' || 
+                computedStyle.backgroundColor === 'transparent') {
+              el.style.backgroundColor = 'white';
+            }
+          });
+          
+          // Ocultar botón de descarga en el clon
+          const clonedButton = clonedDoc.querySelector(".contenedor-boton");
+          if (clonedButton) {
+            clonedButton.style.display = "none";
+          }
+        }
       });
     },
 
     /**
-     * Añade la imagen al PDF
+     * Añade la imagen al PDF con mejor ajuste
      * @param {jsPDF} pdf - Instancia de jsPDF
      * @param {HTMLCanvasElement} canvas - Canvas con la imagen
      */
     _addImageToPdf(pdf, canvas) {
-      const imageData = canvas.toDataURL("image/jpeg", 0.95);
+      const imageData = canvas.toDataURL("image/png", 1.0); // PNG para mejor calidad
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      // Calcular dimensiones manteniendo proporción
-      const imgWidth = pdfWidth - 40; // Margen de 20px a cada lado
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      // Margen más conservador
+      const margin = 20;
+      const maxWidth = pdfWidth - (margin * 2);
+      const maxHeight = pdfHeight - (margin * 2);
+      
+      // Calcular escala manteniendo proporción
+      const scaleX = maxWidth / canvas.width;
+      const scaleY = maxHeight / canvas.height;
+      const scale = Math.min(scaleX, scaleY, 0.8); // Reducir un poco más para evitar recortes
+      
+      const imgWidth = canvas.width * scale;
+      const imgHeight = canvas.height * scale;
       
       // Centrar la imagen
-      const xPos = 20; // Margen izquierdo
-      const yPos = 20; // Margen superior
+      const xPos = (pdfWidth - imgWidth) / 2;
+      const yPos = margin;
 
-      // Si la imagen es más alta que la página, ajustar
-      if (imgHeight > pdfHeight - 40) {
-        const scaleFactor = (pdfHeight - 40) / imgHeight;
-        const newWidth = imgWidth * scaleFactor;
-        const newHeight = imgHeight * scaleFactor;
-        const centeredX = (pdfWidth - newWidth) / 2;
-        
-        pdf.addImage(imageData, "JPEG", centeredX, yPos, newWidth, newHeight);
+      // Si la imagen es muy alta, dividirla en páginas
+      if (imgHeight > maxHeight) {
+        this._addMultiPageImage(pdf, imageData, canvas, imgWidth, maxHeight, xPos, margin);
       } else {
-        pdf.addImage(imageData, "JPEG", xPos, yPos, imgWidth, imgHeight);
+        pdf.addImage(imageData, "PNG", xPos, yPos, imgWidth, imgHeight);
+      }
+    },
+
+    /**
+     * Añade imagen en múltiples páginas si es muy alta
+     * @param {jsPDF} pdf - Instancia de jsPDF
+     * @param {string} imageData - Datos de la imagen
+     * @param {HTMLCanvasElement} canvas - Canvas original
+     * @param {number} imgWidth - Ancho de la imagen en el PDF
+     * @param {number} maxHeight - Altura máxima por página
+     * @param {number} xPos - Posición X
+     * @param {number} margin - Margen
+     */
+    _addMultiPageImage(pdf, imageData, canvas, imgWidth, maxHeight, xPos, margin) {
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      const scale = imgWidth / canvas.width;
+      
+      let currentY = 0;
+      let pageCount = 0;
+      
+      while (currentY < canvas.height) {
+        if (pageCount > 0) {
+          pdf.addPage();
+        }
+        
+        const remainingHeight = canvas.height - currentY;
+        const sliceHeight = Math.min(remainingHeight, maxHeight / scale);
+        
+        // Crear canvas temporal para esta sección
+        const tempCanvas = document.createElement('canvas');
+        const tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = sliceHeight;
+        
+        // Copiar la sección correspondiente
+        tempCtx.drawImage(canvas, 0, currentY, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
+        
+        const sliceImageData = tempCanvas.toDataURL("image/png", 1.0);
+        const sliceImgHeight = sliceHeight * scale;
+        
+        pdf.addImage(sliceImageData, "PNG", xPos, margin, imgWidth, sliceImgHeight);
+        
+        currentY += sliceHeight;
+        pageCount++;
       }
     },
 
@@ -266,24 +320,84 @@ document.addEventListener("DOMContentLoaded", () => {
      */
     _handlePdfError(error) {
       console.error("Error al generar PDF:", error);
-      alert("Error al generar el PDF. Revisa la consola para más detalles.");
+      alert("Error al generar el PDF. Por favor, intenta nuevamente.");
     }
   };
 
-  // Inicialización de los módulos
+  /**
+   * Versión alternativa simple del generador de PDF
+   * (Descomenta este bloque y comenta el PdfGenerator anterior si necesitas una versión más simple)
+   */
+  /*
+  const SimplePdfGenerator = {
+    setup() {
+      const button = document.querySelector(".botón a");
+      if (button) {
+        button.addEventListener("click", this._generatePdf.bind(this));
+      }
+    },
+
+    async _generatePdf(e) {
+      e.preventDefault();
+      
+      try {
+        // Ocultar botón temporalmente
+        const downloadButton = document.querySelector(".contenedor-boton");
+        if (downloadButton) downloadButton.style.display = "none";
+        
+        // Esperar un poco para que se aplique el cambio
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF("p", "mm", "a4");
+        
+        // Captura más simple y directa
+        const canvas = await html2canvas(document.body, {
+          backgroundColor: '#ffffff',
+          scale: 1,
+          logging: false,
+          useCORS: true
+        });
+        
+        const imgData = canvas.toDataURL('image/jpeg', 0.7);
+        const imgWidth = 190; // A4 width minus margins
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        
+        pdf.addImage(imgData, 'JPEG', 10, 10, imgWidth, imgHeight);
+        pdf.save('Formato_de_Retiro.pdf');
+        
+        // Restaurar botón
+        if (downloadButton) downloadButton.style.display = "";
+        
+      } catch (error) {
+        console.error("Error:", error);
+        alert("Error al generar el PDF");
+      }
+    }
+  };
+  */
+
+  // ==========================================
+  // INICIALIZACIÓN DE TODOS LOS MÓDULOS
+  // ==========================================
+
+  // Validación de campos de texto (solo letras y espacios, convertir a mayúsculas)
   FieldValidator.validateInputs(
     ["nombre", "patrocinadora", "beneficiario_nombre_completo", "entidad_bancaria"],
-    /[^a-zA-Z\s]/g,
+    /[^a-zA-ZÀ-ÿ\s]/g, // Incluye caracteres con tildes
     val => val.toUpperCase()
   );
 
+  // Validación de campos numéricos (solo números)
   FieldValidator.validateInputs(
     ["num_documento", "telefono", "beneficiario_numero_id", "numero_cuenta_bancaria"],
     /[^0-9]/g
   );
 
+  // Configurar el manejo del campo de monto de retiro
   AmountFieldManager.setup();
   
+  // Configurar checkboxes exclusivos para diferentes grupos
   ExclusiveCheckboxManager.setupExclusiveGroups([
     "tipo_retiro", 
     "motivo_retiro", 
@@ -291,5 +405,12 @@ document.addEventListener("DOMContentLoaded", () => {
     "tipo_cuenta"
   ]);
 
+  // Configurar la generación de PDF
   PdfGenerator.setup();
+  
+  // Para usar la versión simple, descomenta la siguiente línea y comenta la anterior:
+  // SimplePdfGenerator.setup();
+
+  // Mensaje de inicialización exitosa (opcional, para debugging)
+  console.log("✅ Todos los módulos del formulario han sido inicializados correctamente");
 });
