@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/x-icon" href="./img/Icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Sofia+Sans:wght@400;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./reset.css" />
+    <link rel="stylesheet" href="./estilos.css" />
+    <title>Formato Retiro Sura</title>
+  </head>
+  <body>
+    <header>
+      <div class="header_logos">
+        <div class="header_logo_sura">
+          <img src="./img/Sura_Logo.png" alt="Logo Sura" />
+        </div>
+        <div class="header_logo_proteccion">
+          <img src="./img/Logo_Protección.png" alt="Logo Protección" />
+        </div>
+      </div>
+      <div class="header_titulos">
+        <h2>SOLICITUD DE RETIRO/TRASLADO</h2>
+        <h2>PLAN INSTITUCIONAL FONDO SURA CÓD 9872</h2>
+      </div>
+    </header>
+    <main>
+      <div class="contenedor_info_basica">
+        <h2 class="titulo_info_basica">INFORMACIÓN BÁSICA</h2>
+        <div class="grid_info_basica">
+          <div class="item-fecha">
+            <label for="fecha">FECHA:</label>
+            <input type="date" id="fecha" name="fecha" />
+          </div>
+          <div class="item-tipo-documento">
+            <label for="tipo_documento">TIPO DE DOCUMENTO:</label>
+            <select id="tipo_documento" name="tipo_documento">
+              <option value="cc">--Seleccione una Opción--</option>
+              <option value="cc">Cédula de ciudadanía</option>
+              <option value="ti">Tarjeta de identidad</option>
+              <option value="ce">Cédula de extranjería</option>
+              <option value="pas">Pasaporte</option>
+              <option value="pt">Permiso de Permanencia Temporal</option>
+            </select>
+          </div>
+          <div class="item-numero-documento">
+            <label for="num_documento">NÚMERO DE DOCUMENTO:</label>
+            <input type="text" id="num_documento" name="num_documento" />
+          </div>
+          <div class="item-nombre">
+            <label for="nombre">NOMBRE:</label>
+            <input type="text" id="nombre" name="nombre" />
+          </div>
+          <div class="item-telefono">
+            <label for="telefono">TELÉFONO:</label>
+            <input type="tel" id="telefono" name="telefono" />
+          </div>
+          <div class="item-correo">
+            <label for="correo">CORREO ELECTRÓNICO:</label>
+            <input type="email" id="correo" name="correo" />
+          </div>
+        </div>
+      </div>
+      <div class="contenedor_retiro_traslado">
+        <h2 class="titulo_retiro_traslado">
+          INFORMACIÓN DEL RETIRO / TRASLADO
+        </h2>
+        <div class="grid_retiro_traslado">
+          <div class="item-tipo-retiro">
+            <h3>TIPO DE RETIRO/ TRASLADO</h3>
+            <div>
+              <input
+                type="checkbox"
+                id="retiro_total"
+                name="tipo_retiro"
+                value="retiro_total"
+              />
+              <label for="retiro_total">RETIRO TOTAL DEL PLAN</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                id="traslado_afc"
+                name="tipo_retiro"
+                value="traslado_afc"
+              />
+              <label for="traslado_afc">TRASLADO AFC</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                id="traslado_voluntarios"
+                name="tipo_retiro"
+                value="traslado_voluntarios"
+              />
+              <label for="traslado_voluntarios"
+                >TRASLADO A FONDOS VOLUNTARIOS</label
+              >
+            </div>
+          </div>
+          <div class="item-patrocinadora">
+            <h3>PATROCINADORA</h3>
+            <p>Escriba el nombre de la empresa en la que labora</p>
+            <input type="text" id="patrocinadora" name="patrocinadora" />
+          </div>
+          <div class="item-valor-retiro">
+            <h3>VALOR DEL RETIRO</h3>
+            <p style="font-family: Sofia Sans, sans-serif; font-size: 1.6rem">
+              MÁXIMO DISPONIBLE*
+            </p>
+            <p class="nota-retiro">
+              *Protección no se responsabiliza por la disminución del valor de
+              la unidad de los portafolios, ya que esta obedece a las
+              variaciones propias del mercado
+            </p>
+          </div>
+          <div class="item-motivo-retiro">
+            <h3>MOTIVO DEL RETIRO</h3>
+            <div>
+              <input
+                type="checkbox"
+                id="gastos_inesperados"
+                name="motivo_retiro"
+                value="gastos_inesperados"
+              />
+              <label for="gastos_inesperados">Gastos inesperados</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                id="objetivo_ahorro"
+                name="motivo_retiro"
+                value="objetivo_ahorro"
+              />
+              <label for="objetivo_ahorro">Cumplí mi objetivo de ahorro</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                id="compra_inmobiliaria"
+                name="motivo_retiro"
+                value="compra_inmobiliaria"
+              />
+              <label for="compra_inmobiliaria">Compra Inmobiliaria</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                id="otra_inversion"
+                name="motivo_retiro"
+                value="otra_inversion"
+              />
+              <label for="otra_inversion">Otra opción de inversión</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                id="pago_obligaciones"
+                name="motivo_retiro"
+                value="pago_obligaciones"
+              />
+              <label for="pago_obligaciones"
+                >Pago de obligaciones financieras/ Tributarias</label
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="contenedor_transaccion">
+        <h2 class="titulo_transaccion">INFORMACIÓN DE LA TRANSACCIÓN</h2>
+        <div class="grid_transaccion">
+          <div class="item-forma-retiro">
+            <h3>FORMA DEL RETIRO</h3>
+            <div class="opciones-retiro">
+              <div>
+                <input
+                  type="checkbox"
+                  id="transferencia"
+                  name="forma_retiro"
+                  value="transferencia"
+                />
+                <label for="transferencia">TRANSFERENCIA</label>
+              </div>
+              <div>
+                <input
+                  type="checkbox"
+                  id="cheque"
+                  name="forma_retiro"
+                  value="cheque"
+                />
+                <label for="cheque">CHEQUE</label>
+              </div>
+            </div>
+            <p class="nota-transaccion">
+              <strong style="color: brown">Nota:</strong>La oferta de servicio
+              para procesar el pago, son máximo 5 días hábiles, una vez el
+              formato este correcto y completo.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="contenedor_beneficiario">
+        <h2 class="titulo_beneficiario">
+          BENEFICIARIO DEL RETIRO A CUENTA PROPIA O TERCERO
+        </h2>
+        <div class="grid_beneficiario_definitivo">
+          <div class="item-nombre-completo-v3">
+            <label for="beneficiario_nombre_completo">NOMBRE COMPLETO</label>
+            <input
+              type="text"
+              id="beneficiario_nombre_completo"
+              name="beneficiario_nombre_completo"
+            />
+          </div>
+          <div class="item-tipo-id-beneficiario">
+            <label for="tipo_id_beneficiario">TIPO DE ID</label>
+            <select id="tipo_id_beneficiario" name="tipo_id_beneficiario">
+              <option value="ce">--Seleccione una Opción--</option>
+              <option value="cc">Cédula de ciudadanía</option>
+              <option value="ti">Tarjeta de identidad</option>
+              <option value="ce">Cédula de extranjería</option>
+              <option value="ce">Pasaporte</option>
+              <option value="ce">Permiso Especial Permanencia</option>
+            </select>
+          </div>
+          <div class="item-numero-id-v3">
+            <label for="beneficiario_numero_id">NÚMERO DE ID</label>
+            <input
+              type="text"
+              id="beneficiario_numero_id"
+              name="beneficiario_numero_id"
+            />
+          </div>
+
+          <div class="item-numero-cuenta-v3">
+            <label for="numero_cuenta_bancaria"
+              >NUMERO DE LA CUENTA BANCARIA</label
+            >
+            <input
+              type="text"
+              id="numero_cuenta_bancaria"
+              name="numero_cuenta_bancaria"
+            />
+          </div>
+
+          <div class="item-tipo-cuenta-v3">
+            <label>TIPO DE CUENTA BANCARIA</label>
+            <div class="opciones-tipo-cuenta">
+              <div>
+                <input
+                  type="checkbox"
+                  id="cuenta_ahorro"
+                  name="tipo_cuenta"
+                  value="ahorro"
+                />
+                <label for="cuenta_ahorro">AHORRO</label>
+              </div>
+              <div>
+                <input
+                  type="checkbox"
+                  id="cuenta_corriente"
+                  name="tipo_cuenta"
+                  value="corriente"
+                />
+                <label for="cuenta_corriente">CORRIENTE</label>
+              </div>
+            </div>
+          </div>
+          <div class="item-entidad-bancaria-v3">
+            <label for="entidad_bancaria">ENTIDAD BANCARIA</label>
+            <input type="text" id="entidad_bancaria" name="entidad_bancaria" />
+          </div>
+        </div>
+      </div>
+      <div class="contenedor_firmas">
+        <h2 class="titulo_firmas">FIRMAS Y AUTORIZACIONES</h2>
+        <div class="grid_firmas">
+          <div class="item-firma-afiliado">
+            <label for="firma_afiliado">FIRMA DEL AFILIADO</label>
+            <div class="espacio-firma"></div>
+          </div>
+          <div class="item-fecha-firma">
+            <label for="fecha_firma">FECHA:</label>
+            <input type="date" id="fecha_firma" name="fecha_firma" />
+          </div>
+        </div>
+      </div>
+      <div class="contenedor-boton">
+        <button class="botón">
+          <a href="./pdf/solicitud_retiro_sura.pdf" target="_blank"
+            >Descargar PDF</a
+          >
+        </button>
+      </div>
+    </main>
+    <footer>
+      <p>&copy; 2025 - Desarrollado por Cesar Martinez</p>
+      <a href="https://portafolio-beta-black.vercel.app/index.html"
+        ><img
+          src="./img/logo_letra_negra_sin_fondo.png"
+          alt="Logo desarrollador"
+      /></a>
+    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="./script-retiro-sura.js"></script>
+  </body>
+</html>

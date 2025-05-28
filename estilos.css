@@ -1,0 +1,652 @@
+.sofia-sans {
+  font-family: "Sofia Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 1000;
+  font-style: bold;
+}
+
+:root {
+  --color-primario: #ffffff;
+  --color-secundario: #053c74;
+  --color-terciario: #7fb9e9;
+  --color-cuaternario: #000000;
+  --color-gris-claro: #d3d3d3; /* Nuevo color para los títulos de la tabla */
+}
+html,
+body {
+  height: 100%; /* Asegura que ambos tomen la altura completa del viewport */
+  margin: 0; /* Elimina cualquier margen predeterminado */
+  padding: 0; /* Elimina cualquier padding predeterminado */
+}
+
+body {
+  /* Mantén tus estilos existentes, pero ajustemos el padding-bottom y la altura min */
+  width: 100%;
+  min-height: 100vh; /* Asegura que el body sea al menos tan alto como el viewport */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--color-primario);
+  padding: 20px 0;
+  padding-bottom: 300px; /* Mantén un valor generoso. Ajusta según la altura real de tu footer */
+  box-sizing: border-box;
+}
+
+h2 {
+  font-family: "Sofia Sans", sans-serif;
+  font-size: 1.7rem;
+  color: var(--color-secundario);
+}
+h3{
+  background-color: var(--color-gris-claro);
+  font-family: "Sofia Sans", sans-serif;
+  font-size: 1.3rem;
+  color: var(--color-cuaternario);
+}
+
+header {
+  width: 100%;
+  max-width: 1250px;
+  margin: 10px auto;
+  font-family: "Sofia Sans", sans-serif;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  background-color: var(--color-primario);
+}
+
+.header_logos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 30px 0;
+  flex: 1;
+}
+
+.header_logo_sura {
+  width: 50px;
+  height: auto;
+  flex: 1;
+}
+
+.header_logo_proteccion {
+  width: 350px;
+  height: auto;
+  flex: 5;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.header_titulos {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  flex: 1;
+}
+  main {
+  flex-grow: 1; /* Esto hará que el main ocupe todo el espacio vertical disponible */
+  width: 100%; /* Asegura que el main tenga el ancho completo */
+  max-width: 1250px;
+  margin-bottom: 60px;
+  border: none; /* Alinea con el max-width de tus secciones */
+  /* Si ya tienes estilos para 'main', asegúrate de que 'flex-grow: 1;' esté presente. */
+}
+
+/* Estilos para la sección de Información Básica */
+.contenedor_info_basica {
+  width: 100%;
+  max-width: 1250px;
+  margin: 20px auto;
+  border: 2px solid black;
+}
+
+.titulo_info_basica {
+  background-color: var(--color-terciario);
+  padding: 2px;
+  text-align: center;
+  font-size: 1.5rem;
+  border-bottom: 2px solid black;
+  margin: 0;
+}
+
+.grid_info_basica {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-rows: 80px 80px 80px;
+  width: 100%;
+}
+
+.grid_info_basica > div {
+  border: 2px solid black;
+  padding: 8px;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.item-fecha {
+  grid-column: 1 / 2;
+}
+
+.item-tipo-documento {
+  grid-column: 2 / 3;
+}
+
+.item-numero-documento {
+  grid-column: 3 / 4;
+}
+
+.item-nombre {
+  grid-column: 1 / 4;
+}
+
+.item-telefono {
+  grid-column: 1 / 2;
+}
+
+.item-correo {
+  grid-column: 2 / 4;
+}
+
+label {
+  font-family: "Sofia Sans", sans-serif;
+  font-size: 1.1rem;
+  display: block;
+  font-weight: bold;
+  margin-bottom: 3px;
+}
+
+input,
+select {
+  box-sizing: border-box;
+  font-family: "Sofia Sans", sans-serif;
+  font-size: 1.5rem;
+  width: 100%;
+  padding: 2.5px 8px;
+  border: 1px solid #ccc;
+  height: auto;
+}
+
+/* Nuevos estilos para la sección de Retiro/Traslado */
+.contenedor_retiro_traslado {
+  width: 100%;
+  max-width: 1250px;
+  margin: 20px auto;
+  border: 2px solid black;
+}
+
+.titulo_retiro_traslado {
+  background-color: var(--color-terciario);
+  padding: 2px;
+  text-align: center;
+  font-size: 1.5rem;
+  border-bottom: 2px solid black;
+  margin: 0;
+}
+
+.grid_retiro_traslado {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto auto; /* Las filas se adaptarán al contenido */
+  width: 100%;
+}
+
+.grid_retiro_traslado > div {
+  border: 2px solid black;
+  padding: 8px;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+  /* justify-content: center; */ /* Removido para alinear mejor el contenido */
+}
+
+.item-tipo-retiro label,
+.item-patrocinadora label,
+.item-valor-retiro label,
+.item-motivo-retiro label {
+  padding: 2px 0;
+  text-align: left;
+  font-family: "Sofia Sans", sans-serif;
+  margin-bottom: 5px;
+  font-size: 2rem;
+}
+
+.item-tipo-retiro {
+  grid-column: 1 / 2;
+  grid-row: 1 / 2;
+}
+
+.item-patrocinadora {
+  grid-column: 2 / 3;
+  grid-row: 1 / 2;
+}
+
+.item-valor-retiro {
+  grid-column: 1 / 2;
+  grid-row: 2 / 3;
+}
+
+.item-motivo-retiro {
+  grid-column: 2 / 3;
+  grid-row: 2 / 3;
+}
+
+.item-tipo-retiro div,
+.item-motivo-retiro div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.item-tipo-retiro input[type="checkbox"],
+.item-motivo-retiro input[type="checkbox"] {
+  width: 20px; /* Tamaño de los checkboxes */
+  height: 20px;
+  margin-right: 5px;
+}
+
+.item-tipo-retiro label,
+.item-motivo-retiro label {
+  font-weight: normal; /* Labels de checkbox sin negrita */
+  font-size: 1.2rem;
+  margin-bottom: 0; /* Sin margen inferior */
+}
+
+.item-patrocinadora p {
+
+  font-size: 1.1rem;
+  font-family: "Sofia Sans", sans-serif;
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.item-valor-retiro p {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.nota-retiro {
+  font-family: "Sofia Sans", sans-serif;
+  font-size: 1rem;
+  font-style: italic;
+  margin-top: 10px;
+  line-height: 1.2;
+}
+/* Nuevos estilos para la sección de Información de la Transacción */
+.contenedor_transaccion {
+  width: 100%;
+  max-width: 1250px;
+  margin: 20px auto;
+  border: 2px solid black;
+}
+
+.titulo_transaccion {
+  background-color: var(--color-terciario);
+  padding: 2px;
+  text-align: center;
+  font-size: 1.5rem;
+  border-bottom: 2px solid black;
+  margin: 0;
+}
+
+.grid_transaccion {
+  display: grid;
+  grid-template-columns: 1fr; /* Una sola columna para esta sección */
+  width: 100%;
+}
+
+.grid_transaccion > div {
+  border: 2px solid black;
+  padding: 8px;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-forma-retiro label {
+  background-color: var(--color-gris-claro);
+  padding: 2px 0;
+  text-align: left;
+  border-bottom: 2px solid black;
+  margin-bottom: 5px;
+}
+
+.opciones-retiro {
+  display: flex;
+  justify-content: flex-start; /* Alinea los elementos al inicio */
+  gap: 80px; /* Espacio entre los checkboxes */
+  padding: 15px 0; /* Padding vertical para separar del título y la nota */
+  padding-left: 10px; /* Un poco de padding a la izquierda */
+}
+
+.opciones-retiro > div {
+  display: flex;
+  align-items: center;
+}
+
+.opciones-retiro input[type="checkbox"] {
+  width: 30px; /* Tamaño de los checkboxes */
+  height: 30px;
+  margin-right: 10px; /* Espacio entre el checkbox y el texto */
+}
+
+.opciones-retiro label {
+  font-weight: normal; /* Labels de checkbox sin negrita */
+  font-size: 1.2rem; /* Tamaño de fuente para los textos de opción */
+  margin-bottom: 0; /* Sin margen inferior */
+  background-color: transparent; /* Fondo transparente para las labels de las opciones */
+  border-bottom: none; /* Sin borde inferior para las labels de las opciones */
+}
+.nota-transaccion {
+  display: flex;
+  font-size: 1.1rem;
+  align-items: center;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 2px solid black; /* Línea superior para la nota */
+  text-align: left;
+  line-height: 1.4;
+  gap: 10px; /* Espacio entre el icono y el texto */
+  font-family: "Sofia Sans", sans-serif;
+
+}
+/* Nuevos estilos para la sección de Beneficiario del Retiro - VERSIÓN FINAL CORREGIDA */
+.contenedor_beneficiario {
+  width: 100%;
+  max-width: 1250px;
+  margin: 20px auto;
+  border: 2px solid black;
+}
+
+.titulo_beneficiario {
+  background-color: var(--color-gris-claro);
+  padding: 2px;
+  text-align: center;
+  font-size: 1.5rem;
+  border-bottom: 2px solid black;
+  margin: 0;
+  font-weight: bold;
+}
+
+.grid_beneficiario_definitivo {
+  display: grid;
+  /* Definimos 4 columnas: una para Nombre Completo, dos para Tipo/Número ID, una para Tipo de Cuenta */
+  grid-template-columns: 2.5fr 1fr 1fr; /* Columna izquierda (Nombre), y luego dos más para Tipo/Número ID */
+  grid-template-rows: auto auto auto; /* Tres filas para Nombre, Cuenta, Entidad */
+  width: 100%;
+}
+
+.grid_beneficiario_definitivo > div {
+  border: 2px solid black; /* Borde para cada celda */
+  padding: 8px;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-nombre-completo-v3 {
+  grid-column: 1 / 2; /* Ocupa la primera columna */
+  grid-row: 1 / 2; /* Ocupa la primera fila */
+}
+
+.item-tipo-id-v3 {
+  grid-column: 2 / 3; /* Ocupa la segunda columna */
+  grid-row: 1 / 2; /* Ocupa la primera fila */
+}
+
+.item-numero-id-v3 {
+  grid-column: 3 / 4; /* Ocupa la tercera columna */
+  grid-row: 1 / 2; /* Ocupa la primera fila */
+}
+
+.item-numero-cuenta-v3 {
+  grid-column: 1 / 2; /* Ocupa la primera columna */
+  grid-row: 2 / 3; /* Ocupa la segunda fila */
+}
+
+.item-entidad-bancaria-v3 {
+  grid-column: 1 / 2; /* Ocupa la primera columna */
+  grid-row: 3 / 4; /* Ocupa la tercera fila */
+}
+
+.item-tipo-cuenta-v3 {
+  grid-column: 2 / 4; /* Ocupa la segunda y tercera columna */
+  grid-row: 2 / 4; /* Ocupa la segunda Y tercera fila (se expande verticalmente) */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centra verticalmente el contenido */
+}
+
+/* Ajustes para las labels dentro del grid */
+.grid_beneficiario_definitivo label {
+  background-color: transparent;
+  border-bottom: none;
+  margin-bottom: 3px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.opciones-tipo-cuenta {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-top: 5px;
+}
+
+.opciones-tipo-cuenta > div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.opciones-tipo-cuenta input[type="checkbox"] {
+  width: 25px;
+  height: 25px;
+  margin-right: 8px;
+}
+
+.opciones-tipo-cuenta label {
+  font-weight: normal;
+  font-size: 1rem;
+  margin-bottom: 0;
+}
+
+/* Nuevos estilos para la sección de Firmas y Autorizaciones */
+.contenedor_firmas {
+  width: 100%;
+  max-width: 1250px;
+  margin: 20px auto; /* Mantén el margen por ahora */
+   border: 2px solid black;
+  /* Propiedades para asegurar que el contenedor abarque su contenido */
+  display: flow-root; /* Esto es como un clearfix moderno, asegura que el contenedor abarque sus hijos flotantes */
+  box-sizing: border-box; /* Asegura que padding y border se incluyan en el width/height */
+  padding-bottom: 0; /* Asegurar que no hay padding extra abajo */
+}
+
+.titulo_firmas {
+  background-color: var(
+    --color-terciario
+  ); /* Usamos el color terciario para el título principal */
+  padding: 2px;
+  text-align: center;
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: bold; /* Título en negrita */
+}
+
+.grid_firmas {
+  display: grid;
+  grid-template-columns: 1fr; /* Una sola columna principal */
+  width: 100%;
+}
+
+.grid_firmas > div {
+  border: 2px solid black; /* Borde para cada "fila" o celda */
+  padding: 8px;
+  font-size: 0.9rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.item-firma-afiliado label {
+  background-color: transparent; /* No tiene fondo gris individual */
+  border-bottom: none;
+  margin-bottom: 3px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.espacio-firma {
+  min-height: 70px; /* Altura para el espacio de la firma */
+  border-bottom: 1px dashed #000; /* Línea discontinua para la firma */
+  margin-top: 20px; /* Espacio superior para la línea */
+}
+
+.item-fecha-firma {
+  border-top: none; /* Evita doble borde si el item anterior ya tiene borde inferior */
+}
+
+.item-fecha-firma label {
+  background-color: transparent;
+  border-bottom: none;
+  margin-bottom: 3px;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.item-fecha-firma input[type="date"] {
+  width: 200px; /* Ancho para el campo de fecha */
+  align-self: flex-start; /* Alinea el input a la izquierda */
+  font-size: 1.2rem; /* Tamaño de fuente para la fecha */
+  padding: 3px 5px;
+  margin-top: 10px;
+}
+.contenedor-boton {
+  width: 100%;
+  max-width: 1250px;
+  margin: 20px auto;
+  display: flex;
+  justify-content: center;
+  padding-bottom: 100px; /* Espacio para el footer */
+}
+
+.botón {
+  width: 200px;
+  height: 50px;
+  background-color: var(--color-secundario);
+  color: var(--color-primario);
+  border: none;
+  padding: 10px 20px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  font-family: "Sofia Sans", sans-serif;
+}
+
+.botón a {
+  color: white;
+  text-decoration: none;
+}
+footer {
+  display: flex;
+  width: 100%;
+  height: 80px; /* Define una altura fija o usa min-height */
+  background-color: var(--color-primario);
+  justify-content: center;
+  align-items: center;
+  position: fixed; /* Fija el footer al fondo de la página */
+  bottom: 0;
+  z-index: 1000;
+  gap: 30px;
+  box-sizing: border-box; /* Asegura que padding no afecte la altura */
+  padding: 25px 0; /* Añade padding interno si es necesario */
+}
+footer p {
+  font-family: "Sofia Sans", sans-serif;
+  font-size: 0.9rem;
+  color: var(--color-secundario);
+  margin: 10px 0;
+}
+footer img {
+  width: 150px; /* Ajusta el tamaño de la imagen del footer */
+  height: auto;
+  margin-top: 20px; /* Espacio superior para la imagen del footer */
+}
+
+/* Media Query para responsividad (asegúrate de que esté dentro de la media query existente o crea una nueva si no existe) */
+@media (max-width: 600px) {
+  .grid_firmas {
+    grid-template-columns: 1fr;
+  }
+
+  .item-firma-afiliado,
+  .item-fecha-firma {
+    grid-column: 1;
+  }
+
+  .item-fecha-firma input[type="date"] {
+    width: 100%; /* La fecha ocupa todo el ancho en móvil */
+  }
+}
+
+/* Media Query para responsividad */
+@media (max-width: 600px) {
+  .grid_beneficiario_definitivo {
+    grid-template-columns: 1fr; /* Una sola columna en móvil */
+    grid-template-rows: auto; /* Las filas se autoajustan */
+  }
+
+  .item-nombre-completo-v3,
+  .item-tipo-id-v3,
+  .item-numero-id-v3,
+  .item-numero-cuenta-v3,
+  .item-tipo-cuenta-v3,
+  .item-entidad-bancaria-v3 {
+    grid-column: 1; /* Todos ocupan la única columna */
+    grid-row: auto; /* Resetea el grid-row para que fluya automáticamente */
+  }
+
+  .item-tipo-cuenta-v3 {
+    justify-content: flex-start;
+  }
+}
+
+/* Media Query para responsividad (asegúrate de que esté dentro de la media query existente o crea una nueva si no existe) */
+@media (max-width: 600px) {
+  .grid_transaccion {
+    grid-template-columns: 1fr;
+  }
+
+  .opciones-retiro {
+    flex-direction: column; /* Apila los checkboxes en pantallas pequeñas */
+    gap: 10px;
+    padding-left: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .grid_info_basica {
+    grid-template-columns: 1fr;
+  }
+
+  .item-fecha,
+  .item-tipo-documento,
+  .item-numero-documento,
+  .item-nombre,
+  .item-telefono,
+  .item-correo {
+    grid-column: 1;
+  }
+
+  .grid_retiro_traslado {
+    grid-template-columns: 1fr;
+  }
+
+  .item-tipo-retiro,
+  .item-patrocinadora,
+  .item-valor-retiro,
+  .item-motivo-retiro {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
