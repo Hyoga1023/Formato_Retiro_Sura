@@ -20,19 +20,15 @@ const FormValidator = {
     );
     textInputs.forEach(input => {
       input.addEventListener('input', (e) => {
-        // Permitir solo letras y espacios (preservar todos los espacios)
         let value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
-        // Convertir a mayúsculas sin normalizar espacios
         value = value.toUpperCase();
         e.target.value = value;
       });
     });
 
-    // Manejar el campo de correo electrónico (mantener en minúsculas, sin restricciones adicionales)
     const emailInput = document.querySelector('#correo');
     if (emailInput) {
       emailInput.addEventListener('input', (e) => {
-        // No aplicar transformaciones, mantener el valor como se escribe
         let value = e.target.value;
         e.target.value = value;
       });
@@ -48,7 +44,6 @@ const FormValidator = {
     );
     numericInputs.forEach(input => {
       input.addEventListener('input', (e) => {
-        // Permitir solo números
         e.target.value = e.target.value.replace(/[^0-9]/g, '');
       });
     });
@@ -98,7 +93,6 @@ const FormValidator = {
       checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', () => {
           if (checkbox.checked) {
-            // Desmarcar otros checkboxes del mismo grupo
             checkboxes.forEach(other => {
               if (other !== checkbox) {
                 other.checked = false;
@@ -112,17 +106,15 @@ const FormValidator = {
 };
 
 /**
- * Módulo de generación de PDF mejorado - Versión con corrección para SELECT, espacios, línea tenue y header
+ * Módulo de generación de PDF optimizado
  */
 const PdfGenerator = {
   /**
    * Configura el botón de generación de PDF
    */
   setup() {
-    // Inicializar validaciones del formulario
     FormValidator.setup();
 
-    // Buscar múltiples selectores posibles para el botón
     const possibleSelectors = [
       ".botón a",
       ".boton a",
@@ -135,29 +127,22 @@ const PdfGenerator = {
     ];
 
     let button = null;
-    
     for (const selector of possibleSelectors) {
       button = document.querySelector(selector);
       if (button) break;
     }
 
     if (button) {
-      // Remover event listeners existentes
       button.removeEventListener("click", this._generatePdf);
-      
-      // Añadir nuevo event listener
       button.addEventListener("click", (e) => {
         e.preventDefault();
         e.stopPropagation();
         this._generatePdf(e);
       });
-      
-      // Asegurar que el href no interfiera
       if (button.href && button.href !== '#') {
         button.setAttribute('data-original-href', button.href);
         button.href = '#';
       }
-      
       console.log("PdfGenerator: Botón configurado correctamente");
     } else {
       console.warn("PdfGenerator: No se encontró el botón de descarga");
@@ -174,12 +159,9 @@ const PdfGenerator = {
     e.stopImmediatePropagation();
     
     try {
-      // Verificar que jsPDF esté disponible
       if (!window.jspdf || !window.jspdf.jsPDF) {
         throw new Error("jsPDF no está cargado correctamente");
       }
-
-      // Verificar que html2canvas esté disponible
       if (!window.html2canvas) {
         throw new Error("html2canvas no está cargado correctamente");
       }
@@ -187,32 +169,17 @@ const PdfGenerator = {
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF("p", "pt", "a4");
       
-      // Mostrar indicador de carga
       this._showLoadingIndicator();
-      
-      // Preparar elementos para captura (solo ocultar botones y footer)
       const elementsToHide = this._prepareForCapture();
-      
-      // Pequeña pausa para que se apliquen los cambios de estilo
       await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Capturar el contenido específico
       const canvas = await this._captureFullContent();
-      
-      // Restaurar elementos ocultos
       this._restoreElements(elementsToHide);
-      
-      // Ocultar indicador de carga
       this._hideLoadingIndicator();
 
-      // Añadir imagen al PDF
       this._addImageToPdf(pdf, canvas);
       
-      // Generar nombre de archivo único
       const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
       const filename = `Formato_de_Retiro_${timestamp}.pdf`;
-      
-      // Descargar el PDF
       pdf.save(filename);
       
       console.log("PDF generado exitosamente:", filename);
@@ -226,9 +193,7 @@ const PdfGenerator = {
    * Muestra indicador de carga
    */
   _showLoadingIndicator() {
-    // Remover indicador existente si existe
     this._hideLoadingIndicator();
-    
     const indicator = document.createElement('div');
     indicator.id = 'pdf-loading-indicator';
     indicator.innerHTML = `
@@ -271,7 +236,6 @@ const PdfGenerator = {
         }
       </style>
     `;
-    
     document.body.appendChild(indicator);
   },
 
@@ -291,7 +255,6 @@ const PdfGenerator = {
    */
   _prepareForCapture() {
     const elementsToHide = [];
-    
     const selectorsToHide = [
       '.contenedor-boton',
       '.botón',
@@ -343,11 +306,11 @@ const PdfGenerator = {
   },
 
   /**
-   * Captura el contenido específico del documento con backgrounds preservados
+   * Captura el contenido específico del documento con baja resolución
    * @returns {Promise<HTMLCanvasElement>} - Canvas con la imagen
    */
   async _captureFullContent() {
-    const container = document.body;
+    const container = document.querySelector('.pdf-content') || document.body;
 
     if (!container) {
       throw new Error("No se encontró el contenedor del documento");
@@ -360,10 +323,10 @@ const PdfGenerator = {
     );
 
     return await html2canvas(container, {
-      scale: 2,
+      scale: 1, // Reducir resolución
       useCORS: true,
       allowTaint: true,
-      backgroundColor: null,
+      backgroundColor: '#ffffff', // Fondo blanco para evitar transparencias
       scrollX: 0,
       scrollY: 0,
       logging: false,
@@ -373,12 +336,10 @@ const PdfGenerator = {
       imageTimeout: 15000,
       ignoreElements: (element) => {
         if (!element || !element.tagName) return false;
-
         const tagName = element.tagName.toLowerCase();
         const className = element.className || '';
         const id = element.id || '';
-
-        const shouldIgnore = [
+        return [
           tagName === 'script',
           tagName === 'style',
           tagName === 'button',
@@ -394,8 +355,6 @@ const PdfGenerator = {
           element.style.display === 'none',
           element.style.visibility === 'hidden'
         ].some(condition => condition);
-
-        return shouldIgnore;
       },
       onclone: (clonedDoc, element) => {
         this._cleanClonedDocument(clonedDoc);
@@ -406,12 +365,11 @@ const PdfGenerator = {
   },
 
   /**
-   * FUNCIÓN MODIFICADA: Preserva los estados de los elementos de formulario
+   * Preserva los estados de los elementos de formulario
    * @param {Document} clonedDoc - Documento clonado
    */
   _preserveFormStates(clonedDoc) {
     try {
-      // Preservar estados de SELECT con corrección de espacios
       const originalSelects = document.querySelectorAll('select');
       const clonedSelects = clonedDoc.querySelectorAll('select');
       
@@ -422,7 +380,6 @@ const PdfGenerator = {
           const selectedOption = originalSelect.options[originalSelect.selectedIndex];
           
           let selectedText = selectedOption?.text || selectedOption?.textContent || '';
-          // Normalizar espacios solo para el PDF
           selectedText = selectedText.trim().replace(/\s+/g, ' ');
           const selectedTextUpper = selectedText.toUpperCase();
           
@@ -474,7 +431,6 @@ const PdfGenerator = {
         }
       });
 
-      // Preservar estados de INPUT
       const originalInputs = document.querySelectorAll('input');
       const clonedInputs = clonedDoc.querySelectorAll('input');
       
@@ -487,9 +443,7 @@ const PdfGenerator = {
           } else if (originalInput.type === 'date') {
             clonedInput.value = originalInput.value;
           } else {
-            // Normalizar espacios solo para el PDF, excepto para correo
             let cleanValue = originalInput.value.trim().replace(/\s+/g, ' ');
-            // Aplicar mayúsculas solo a campos de texto, no a numéricos ni correo
             const isNumeric = ['num_documento', 'telefono', 'beneficiario_numero_id', 'numero_cuenta_bancaria'].includes(originalInput.id);
             const isEmail = originalInput.id === 'correo';
             if (!isNumeric && !isEmail) {
@@ -510,7 +464,6 @@ const PdfGenerator = {
         }
       });
 
-      // Preservar estados de TEXTAREA (no hay en este formulario, pero se mantiene por compatibilidad)
       const originalTextareas = document.querySelectorAll('textarea');
       const clonedTextareas = clonedDoc.querySelectorAll('textarea');
       
@@ -537,7 +490,7 @@ const PdfGenerator = {
   },
 
   /**
-   * Limpia SOLO elementos específicos del documento clonado
+   * Limpia elementos específicos del documento clonado
    * @param {Document} clonedDoc - Documento clonado
    */
   _cleanClonedDocument(clonedDoc) {
@@ -570,7 +523,6 @@ const PdfGenerator = {
       }
     });
 
-    // Limpiar bordes y pseudo-elementos en la sección problemática
     try {
       const gridElements = clonedDoc.querySelectorAll(
         '.grid_retiro_traslado, .item-tipo-retiro, .item-patrocinadora'
@@ -582,7 +534,6 @@ const PdfGenerator = {
         element.style.boxShadow = 'none';
         element.style.outline = 'none';
         element.style.background = 'transparent';
-        // Eliminar pseudo-elementos
         element.style.setProperty('content', 'none', 'important');
         element.style.setProperty('::before', 'none', 'important');
         element.style.setProperty('::after', 'none', 'important');
@@ -593,7 +544,7 @@ const PdfGenerator = {
   },
 
   /**
-   * Preserva todos los estilos originales incluyendo backgrounds y font-family
+   * Preserva estilos originales
    * @param {Document} clonedDoc - Documento clonado
    */
   _preserveStyles(clonedDoc) {
@@ -604,25 +555,12 @@ const PdfGenerator = {
           const originalEl = this._findOriginalElement(el);
           if (originalEl) {
             const computedStyle = window.getComputedStyle(originalEl);
-            
-            if (computedStyle.fontFamily) {
-              el.style.fontFamily = computedStyle.fontFamily;
-            }
-            if (computedStyle.fontSize) {
-              el.style.fontSize = computedStyle.fontSize;
-            }
-            if (computedStyle.fontWeight) {
-              el.style.fontWeight = computedStyle.fontWeight;
-            }
-            if (computedStyle.color) {
-              el.style.color = computedStyle.color;
-            }
-            if (computedStyle.wordSpacing) {
-              el.style.wordSpacing = computedStyle.wordSpacing;
-            }
-            if (computedStyle.letterSpacing) {
-              el.style.letterSpacing = computedStyle.letterSpacing;
-            }
+            if (computedStyle.fontFamily) el.style.fontFamily = computedStyle.fontFamily;
+            if (computedStyle.fontSize) el.style.fontSize = computedStyle.fontSize;
+            if (computedStyle.fontWeight) el.style.fontWeight = computedStyle.fontWeight;
+            if (computedStyle.color) el.style.color = computedStyle.color;
+            if (computedStyle.wordSpacing) el.style.wordSpacing = computedStyle.wordSpacing;
+            if (computedStyle.letterSpacing) el.style.letterSpacing = computedStyle.letterSpacing;
             if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
               el.style.backgroundColor = computedStyle.backgroundColor;
             }
@@ -640,9 +578,7 @@ const PdfGenerator = {
               el.style.height = computedStyle.height || 'auto';
             }
           }
-        } catch (error) {
-          // Ignorar errores de elementos individuales
-        }
+        } catch (error) {}
       });
     } catch (error) {
       console.warn('Error al preservar estilos:', error);
@@ -661,9 +597,7 @@ const PdfGenerator = {
       }
       if (clonedElement.className) {
         const elements = document.getElementsByClassName(clonedElement.className);
-        if (elements.length === 1) {
-          return elements[0];
-        }
+        if (elements.length === 1) return elements[0];
       }
       return null;
     } catch (error) {
@@ -672,15 +606,15 @@ const PdfGenerator = {
   },
 
   /**
-   * Añade la imagen al PDF con mejor ajuste
+   * Añade la imagen al PDF con compresión
    * @param {jsPDF} pdf - Instancia de jsPDF
    * @param {HTMLCanvasElement} canvas - Canvas con la imagen
    */
   _addImageToPdf(pdf, canvas) {
-    const imageData = canvas.toDataURL("image/png", 1.0);
+    const imageData = canvas.toDataURL("image/jpeg", 0.7); // Usar JPEG con compresión
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    const margin = 10;
+    const margin = 5; // Reducir márgenes
     const maxWidth = pdfWidth - (margin * 2);
     const maxHeight = pdfHeight - (margin * 2);
     const scaleX = maxWidth / canvas.width;
@@ -694,12 +628,12 @@ const PdfGenerator = {
     if (imgHeight > maxHeight) {
       this._addMultiPageImage(pdf, imageData, canvas, imgWidth, maxHeight, xPos, margin);
     } else {
-      pdf.addImage(imageData, "PNG", xPos, yPos, imgWidth, imgHeight);
+      pdf.addImage(imageData, "JPEG", xPos, yPos, imgWidth, imgHeight);
     }
   },
 
   /**
-   * Añade imagen en múltiples páginas si es muy alta
+   * Añade imagen en múltiples páginas con compresión
    * @param {jsPDF} pdf - Instancia de jsPDF
    * @param {string} imageData - Datos de la imagen
    * @param {HTMLCanvasElement} canvas - Canvas original
@@ -714,9 +648,7 @@ const PdfGenerator = {
     let pageCount = 0;
     
     while (currentY < canvas.height) {
-      if (pageCount > 0) {
-        pdf.addPage();
-      }
+      if (pageCount > 0) pdf.addPage();
       
       const remainingHeight = canvas.height - currentY;
       const sliceHeight = Math.min(remainingHeight, maxHeight / scale);
@@ -728,11 +660,10 @@ const PdfGenerator = {
       
       tempCtx.drawImage(canvas, 0, currentY, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
       
-      const sliceImageData = tempCanvas.toDataURL("image/png", 1.0);
+      const sliceImageData = tempCanvas.toDataURL("image/jpeg", 0.7); // Usar JPEG
       const sliceImgHeight = sliceHeight * scale;
       
-      // Añadir un pequeño margen adicional para evitar artefactos
-      pdf.addImage(sliceImageData, "PNG", xPos, margin + 2, imgWidth, sliceImgHeight);
+      pdf.addImage(sliceImageData, "JPEG", xPos, margin, imgWidth, sliceImgHeight);
       
       currentY += sliceHeight;
       pageCount++;
@@ -769,7 +700,7 @@ if (document.readyState === 'loading') {
   PdfGenerator.setup();
 }
 
-// También inicializar después de un pequeño delay para asegurar que todo esté cargado
+// Inicializar después de un pequeño delay
 setTimeout(() => {
   PdfGenerator.setup();
 }, 1000);
