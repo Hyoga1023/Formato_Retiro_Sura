@@ -87,7 +87,7 @@ header {
   flex-grow: 1; /* Esto hará que el main ocupe todo el espacio vertical disponible */
   width: 100%; /* Asegura que el main tenga el ancho completo */
   max-width: 1250px;
-  margin-bottom: 60px;
+  margin-bottom: 0;
   border: none; /* Alinea con el max-width de tus secciones */
   /* Si ya tienes estilos para 'main', asegúrate de que 'flex-grow: 1;' esté presente. */
 }

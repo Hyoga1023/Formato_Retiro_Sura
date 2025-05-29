@@ -1,11 +1,127 @@
 /**
- * Módulo de generación de PDF mejorado - Versión con header y backgrounds
+ * Módulo de validación de formulario
+ */
+const FormValidator = {
+  /**
+   * Configura las validaciones del formulario
+   */
+  setup() {
+    this._setupTextInputs();
+    this._setupNumericInputs();
+    this._setupExclusiveCheckboxes();
+  },
+
+  /**
+   * Configura los campos de texto para aceptar solo letras y espacios, y convertir a mayúsculas
+   */
+  _setupTextInputs() {
+    const textInputs = document.querySelectorAll(
+      '#nombre, #patrocinadora, #beneficiario_nombre_completo, #entidad_bancaria'
+    );
+    textInputs.forEach(input => {
+      input.addEventListener('input', (e) => {
+        // Permitir solo letras y espacios (preservar todos los espacios)
+        let value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+        // Convertir a mayúsculas sin normalizar espacios
+        value = value.toUpperCase();
+        e.target.value = value;
+      });
+    });
+
+    // Manejar el campo de correo electrónico (permitir formato de email y convertir a mayúsculas)
+    const emailInput = document.querySelector('#correo');
+    if (emailInput) {
+      emailInput.addEventListener('input', (e) => {
+        // Convertir a mayúsculas sin normalizar espacios
+        let value = e.target.value.toUpperCase();
+        e.target.value = value;
+      });
+    }
+  },
+
+  /**
+   * Configura los campos numéricos para aceptar solo números
+   */
+  _setupNumericInputs() {
+    const numericInputs = document.querySelectorAll(
+      '#num_documento, #telefono, #beneficiario_numero_id, #numero_cuenta_bancaria'
+    );
+    numericInputs.forEach(input => {
+      input.addEventListener('input', (e) => {
+        // Permitir solo números
+        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+      });
+    });
+  },
+
+  /**
+   * Configura los checkboxes para que sean excluyentes en cada grupo
+   */
+  _setupExclusiveCheckboxes() {
+    const checkboxGroups = [
+      {
+        name: 'forma_retiro',
+        selectors: [
+          'input[name="forma_retiro"][value="transferencia"]',
+          'input[name="forma_retiro"][value="cheque"]'
+        ]
+      },
+      {
+        name: 'tipo_cuenta',
+        selectors: [
+          'input[name="tipo_cuenta"][value="ahorro"]',
+          'input[name="tipo_cuenta"][value="corriente"]'
+        ]
+      },
+      {
+        name: 'tipo_retiro',
+        selectors: [
+          'input[name="tipo_retiro"][value="retiro_total"]',
+          'input[name="tipo_retiro"][value="traslado_afc"]',
+          'input[name="tipo_retiro"][value="traslado_voluntarios"]'
+        ]
+      },
+      {
+        name: 'motivo_retiro',
+        selectors: [
+          'input[name="motivo_retiro"][value="gastos_inesperados"]',
+          'input[name="motivo_retiro"][value="objetivo_ahorro"]',
+          'input[name="motivo_retiro"][value="compra_inmobiliaria"]',
+          'input[name="motivo_retiro"][value="otra_inversion"]',
+          'input[name="motivo_retiro"][value="pago_obligaciones"]'
+        ]
+      }
+    ];
+
+    checkboxGroups.forEach(group => {
+      const checkboxes = document.querySelectorAll(group.selectors.join(', '));
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+          if (checkbox.checked) {
+            // Desmarcar otros checkboxes del mismo grupo
+            checkboxes.forEach(other => {
+              if (other !== checkbox) {
+                other.checked = false;
+              }
+            });
+          }
+        });
+      });
+    });
+  }
+};
+
+/**
+ * Módulo de generación de PDF mejorado - Versión con corrección para SELECT y espacios
  */
 const PdfGenerator = {
   /**
    * Configura el botón de generación de PDF
    */
   setup() {
+    // Inicializar validaciones del formulario
+    FormValidator.setup();
+
     // Buscar múltiples selectores posibles para el botón
     const possibleSelectors = [
       ".botón a",
@@ -186,8 +302,8 @@ const PdfGenerator = {
       '.pdf-exclude',
       '#pdf-loading-indicator',
       '.no-pdf',
-      'footer', // Añadir footer
-      '.footer' // Añadir clase footer
+      'footer',
+      '.footer'
     ];
 
     selectorsToHide.forEach(selector => {
@@ -231,7 +347,7 @@ const PdfGenerator = {
    * @returns {Promise<HTMLCanvasElement>} - Canvas con la imagen
    */
   async _captureFullContent() {
-    const container = document.querySelector('.formulario') || document.body; // Ajusta '.formulario' según tu contenedor
+    const container = document.querySelector('.formulario') || document.body;
 
     if (!container) {
       throw new Error("No se encontró el contenedor del documento");
@@ -274,7 +390,7 @@ const PdfGenerator = {
           className.includes('download'),
           className.includes('contenedor-boton'),
           id === 'pdf-loading-indicator',
-          tagName === 'footer' || className.includes('footer'), // Excluir footer
+          tagName === 'footer' || className.includes('footer'),
           element.style.display === 'none',
           element.style.visibility === 'hidden'
         ].some(condition => condition);
@@ -284,8 +400,139 @@ const PdfGenerator = {
       onclone: (clonedDoc, element) => {
         this._cleanClonedDocument(clonedDoc);
         this._preserveStyles(clonedDoc);
+        this._preserveFormStates(clonedDoc);
       }
     });
+  },
+
+  /**
+   * FUNCIÓN MODIFICADA: Preserva los estados de los elementos de formulario
+   * @param {Document} clonedDoc - Documento clonado
+   */
+  _preserveFormStates(clonedDoc) {
+    try {
+      // Preservar estados de SELECT con corrección de espacios
+      const originalSelects = document.querySelectorAll('select');
+      const clonedSelects = clonedDoc.querySelectorAll('select');
+      
+      originalSelects.forEach((originalSelect, index) => {
+        if (clonedSelects[index]) {
+          const clonedSelect = clonedSelects[index];
+          const selectedValue = originalSelect.value;
+          const selectedOption = originalSelect.options[originalSelect.selectedIndex];
+          
+          let selectedText = selectedOption?.text || selectedOption?.textContent || '';
+          // Normalizar espacios solo para el PDF
+          selectedText = selectedText.trim().replace(/\s+/g, ' ');
+          const selectedTextUpper = selectedText.toUpperCase();
+          
+          clonedSelect.value = selectedValue;
+          Array.from(clonedSelect.options).forEach(option => {
+            option.selected = option.value === selectedValue;
+            const optionText = (option.textContent || option.text || '').trim().replace(/\s+/g, ' ');
+            option.textContent = optionText.toUpperCase();
+            option.text = optionText.toUpperCase();
+          });
+          
+          const displaySpan = clonedDoc.createElement('span');
+          displaySpan.textContent = selectedTextUpper;
+          const originalStyles = window.getComputedStyle(originalSelect);
+          
+          displaySpan.style.cssText = `
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            padding-left: 8px;
+            background: ${originalStyles.backgroundColor || 'white'};
+            border: ${originalStyles.border || '1px solid #ccc'};
+            font-family: ${originalStyles.fontFamily || '"Sofia Sans", sans-serif'};
+            font-size: ${originalStyles.fontSize || 'inherit'};
+            font-weight: ${originalStyles.fontWeight || 'inherit'};
+            color: ${originalStyles.color || 'inherit'};
+            pointer-events: none;
+            z-index: 1;
+            text-transform: uppercase;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: normal;
+            word-spacing: normal;
+            letter-spacing: normal;
+          `;
+          
+          clonedSelect.style.opacity = '0';
+          clonedSelect.style.position = 'relative';
+          
+          if (clonedSelect.parentNode) {
+            clonedSelect.parentNode.style.position = 'relative';
+            clonedSelect.parentNode.insertBefore(displaySpan, clonedSelect.nextSibling);
+          }
+        }
+      });
+
+      // Preservar estados de INPUT
+      const originalInputs = document.querySelectorAll('input');
+      const clonedInputs = clonedDoc.querySelectorAll('input');
+      
+      originalInputs.forEach((originalInput, index) => {
+        if (clonedInputs[index]) {
+          const clonedInput = clonedInputs[index];
+          
+          if (originalInput.type === 'checkbox' || originalInput.type === 'radio') {
+            clonedInput.checked = originalInput.checked;
+          } else if (originalInput.type === 'date') {
+            clonedInput.value = originalInput.value;
+          } else {
+            // Normalizar espacios solo para el PDF
+            let cleanValue = originalInput.value.trim().replace(/\s+/g, ' ');
+            // Aplicar mayúsculas solo a campos de texto, no a numéricos
+            const isNumeric = ['num_documento', 'telefono', 'beneficiario_numero_id', 'numero_cuenta_bancaria'].includes(originalInput.id);
+            if (!isNumeric) {
+              cleanValue = cleanValue.toUpperCase();
+            }
+            clonedInput.value = cleanValue;
+            
+            const originalStyles = window.getComputedStyle(originalInput);
+            clonedInput.style.fontFamily = originalStyles.fontFamily || '"Sofia Sans", sans-serif';
+            clonedInput.style.fontSize = originalStyles.fontSize;
+            clonedInput.style.fontWeight = originalStyles.fontWeight;
+            clonedInput.style.wordSpacing = 'normal';
+            clonedInput.style.letterSpacing = 'normal';
+            if (!isNumeric) {
+              clonedInput.style.textTransform = 'uppercase';
+            }
+          }
+        }
+      });
+
+      // Preservar estados de TEXTAREA (no hay en este formulario, pero se mantiene por compatibilidad)
+      const originalTextareas = document.querySelectorAll('textarea');
+      const clonedTextareas = clonedDoc.querySelectorAll('textarea');
+      
+      originalTextareas.forEach((originalTextarea, index) => {
+        if (clonedTextareas[index]) {
+          const cleanValue = originalTextarea.value.trim().replace(/\s+/g, ' ');
+          const upperValue = cleanValue.toUpperCase();
+          clonedTextareas[index].value = upperValue;
+          clonedTextareas[index].textContent = upperValue;
+          
+          const originalStyles = window.getComputedStyle(originalTextarea);
+          clonedTextareas[index].style.textTransform = 'uppercase';
+          clonedTextareas[index].style.fontFamily = originalStyles.fontFamily || '"Sofia Sans", sans-serif';
+          clonedTextareas[index].style.fontSize = originalStyles.fontSize;
+          clonedTextareas[index].style.fontWeight = originalStyles.fontWeight;
+          clonedTextareas[index].style.wordSpacing = 'normal';
+          clonedTextareas[index].style.letterSpacing = 'normal';
+        }
+      });
+
+    } catch (error) {
+      console.warn('Error al preservar estados de formulario:', error);
+    }
   },
 
   /**
@@ -305,8 +552,8 @@ const PdfGenerator = {
       'script',
       'style:not([data-styled]):not([data-emotion])',
       '#pdf-loading-indicator',
-      'footer', // Añadir footer
-      '.footer' // Añadir clase footer
+      'footer',
+      '.footer'
     ];
 
     selectorsToRemove.forEach(selector => {
@@ -324,7 +571,7 @@ const PdfGenerator = {
   },
 
   /**
-   * Preserva todos los estilos originales incluyendo backgrounds
+   * Preserva todos los estilos originales incluyendo backgrounds y font-family
    * @param {Document} clonedDoc - Documento clonado
    */
   _preserveStyles(clonedDoc) {
@@ -336,21 +583,36 @@ const PdfGenerator = {
           if (originalEl) {
             const computedStyle = window.getComputedStyle(originalEl);
             
+            if (computedStyle.fontFamily) {
+              el.style.fontFamily = computedStyle.fontFamily;
+            }
+            if (computedStyle.fontSize) {
+              el.style.fontSize = computedStyle.fontSize;
+            }
+            if (computedStyle.fontWeight) {
+              el.style.fontWeight = computedStyle.fontWeight;
+            }
+            if (computedStyle.color) {
+              el.style.color = computedStyle.color;
+            }
+            if (computedStyle.wordSpacing) {
+              el.style.wordSpacing = computedStyle.wordSpacing;
+            }
+            if (computedStyle.letterSpacing) {
+              el.style.letterSpacing = computedStyle.letterSpacing;
+            }
             if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
               el.style.backgroundColor = computedStyle.backgroundColor;
             }
-            
             if (computedStyle.backgroundImage && computedStyle.backgroundImage !== 'none') {
               el.style.backgroundImage = computedStyle.backgroundImage;
               el.style.backgroundSize = computedStyle.backgroundSize;
               el.style.backgroundPosition = computedStyle.backgroundPosition;
               el.style.backgroundRepeat = computedStyle.backgroundRepeat;
             }
-            
             if (computedStyle.border && computedStyle.border !== 'none') {
               el.style.border = computedStyle.border;
             }
-            
             if (el.tagName.toLowerCase() === 'img') {
               el.style.maxWidth = computedStyle.maxWidth || '100%';
               el.style.height = computedStyle.height || 'auto';
@@ -375,14 +637,12 @@ const PdfGenerator = {
       if (clonedElement.id) {
         return document.getElementById(clonedElement.id);
       }
-      
       if (clonedElement.className) {
         const elements = document.getElementsByClassName(clonedElement.className);
         if (elements.length === 1) {
           return elements[0];
         }
       }
-      
       return null;
     } catch (error) {
       return null;
@@ -398,18 +658,14 @@ const PdfGenerator = {
     const imageData = canvas.toDataURL("image/png", 1.0);
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
-    
     const margin = 10;
     const maxWidth = pdfWidth - (margin * 2);
     const maxHeight = pdfHeight - (margin * 2);
-    
     const scaleX = maxWidth / canvas.width;
     const scaleY = maxHeight / canvas.height;
     const scale = Math.min(scaleX, scaleY, 1.0);
-    
     const imgWidth = canvas.width * scale;
     const imgHeight = canvas.height * scale;
-    
     const xPos = (pdfWidth - imgWidth) / 2;
     const yPos = margin;
 
@@ -466,11 +722,8 @@ const PdfGenerator = {
    */
   _handlePdfError(error) {
     console.error("Error al generar PDF:", error);
-    
     this._hideLoadingIndicator();
-    
     let errorMessage = "Error al generar el PDF. ";
-    
     if (error.message.includes('jsPDF')) {
       errorMessage += "La librería jsPDF no está disponible.";
     } else if (error.message.includes('html2canvas')) {
@@ -480,7 +733,6 @@ const PdfGenerator = {
     } else {
       errorMessage += "Por favor, intenta nuevamente.";
     }
-    
     alert(errorMessage);
   }
 };
