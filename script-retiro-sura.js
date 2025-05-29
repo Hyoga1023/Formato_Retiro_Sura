@@ -28,12 +28,12 @@ const FormValidator = {
       });
     });
 
-    // Manejar el campo de correo electrónico (permitir formato de email y convertir a mayúsculas)
+    // Manejar el campo de correo electrónico (mantener en minúsculas, sin restricciones adicionales)
     const emailInput = document.querySelector('#correo');
     if (emailInput) {
       emailInput.addEventListener('input', (e) => {
-        // Convertir a mayúsculas sin normalizar espacios
-        let value = e.target.value.toUpperCase();
+        // No aplicar transformaciones, mantener el valor como se escribe
+        let value = e.target.value;
         e.target.value = value;
       });
     }
@@ -112,7 +112,7 @@ const FormValidator = {
 };
 
 /**
- * Módulo de generación de PDF mejorado - Versión con corrección para SELECT y espacios
+ * Módulo de generación de PDF mejorado - Versión con corrección para SELECT, espacios, línea tenue y header
  */
 const PdfGenerator = {
   /**
@@ -347,7 +347,7 @@ const PdfGenerator = {
    * @returns {Promise<HTMLCanvasElement>} - Canvas con la imagen
    */
   async _captureFullContent() {
-    const container = document.querySelector('.formulario') || document.body;
+    const container = document.body;
 
     if (!container) {
       throw new Error("No se encontró el contenedor del documento");
@@ -487,11 +487,12 @@ const PdfGenerator = {
           } else if (originalInput.type === 'date') {
             clonedInput.value = originalInput.value;
           } else {
-            // Normalizar espacios solo para el PDF
+            // Normalizar espacios solo para el PDF, excepto para correo
             let cleanValue = originalInput.value.trim().replace(/\s+/g, ' ');
-            // Aplicar mayúsculas solo a campos de texto, no a numéricos
+            // Aplicar mayúsculas solo a campos de texto, no a numéricos ni correo
             const isNumeric = ['num_documento', 'telefono', 'beneficiario_numero_id', 'numero_cuenta_bancaria'].includes(originalInput.id);
-            if (!isNumeric) {
+            const isEmail = originalInput.id === 'correo';
+            if (!isNumeric && !isEmail) {
               cleanValue = cleanValue.toUpperCase();
             }
             clonedInput.value = cleanValue;
@@ -502,7 +503,7 @@ const PdfGenerator = {
             clonedInput.style.fontWeight = originalStyles.fontWeight;
             clonedInput.style.wordSpacing = 'normal';
             clonedInput.style.letterSpacing = 'normal';
-            if (!isNumeric) {
+            if (!isNumeric && !isEmail) {
               clonedInput.style.textTransform = 'uppercase';
             }
           }
@@ -568,6 +569,27 @@ const PdfGenerator = {
         console.warn(`Error al remover elementos ${selector} del clon:`, error);
       }
     });
+
+    // Limpiar bordes y pseudo-elementos en la sección problemática
+    try {
+      const gridElements = clonedDoc.querySelectorAll(
+        '.grid_retiro_traslado, .item-tipo-retiro, .item-patrocinadora'
+      );
+      gridElements.forEach(element => {
+        element.style.border = 'none';
+        element.style.borderTop = 'none';
+        element.style.borderBottom = 'none';
+        element.style.boxShadow = 'none';
+        element.style.outline = 'none';
+        element.style.background = 'transparent';
+        // Eliminar pseudo-elementos
+        element.style.setProperty('content', 'none', 'important');
+        element.style.setProperty('::before', 'none', 'important');
+        element.style.setProperty('::after', 'none', 'important');
+      });
+    } catch (error) {
+      console.warn('Error al limpiar estilos en grid_retiro_traslado:', error);
+    }
   },
 
   /**
@@ -709,7 +731,8 @@ const PdfGenerator = {
       const sliceImageData = tempCanvas.toDataURL("image/png", 1.0);
       const sliceImgHeight = sliceHeight * scale;
       
-      pdf.addImage(sliceImageData, "PNG", xPos, margin, imgWidth, sliceImgHeight);
+      // Añadir un pequeño margen adicional para evitar artefactos
+      pdf.addImage(sliceImageData, "PNG", xPos, margin + 2, imgWidth, sliceImgHeight);
       
       currentY += sliceHeight;
       pageCount++;
