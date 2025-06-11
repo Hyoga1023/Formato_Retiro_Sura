@@ -83,7 +83,8 @@ const FormValidator = {
           'input[name="motivo_retiro"][value="objetivo_ahorro"]',
           'input[name="motivo_retiro"][value="compra_inmobiliaria"]',
           'input[name="motivo_retiro"][value="otra_inversion"]',
-          'input[name="motivo_retiro"][value="pago_obligaciones"]'
+          'input[name="motivo_retiro"][value="pago_obligaciones"]',
+          'input[name="motivo_retiro"][value="insatisfaccion"]'
         ]
       }
     ];

@@ -152,11 +152,11 @@
             <div>
               <input
                 type="checkbox"
-                id="otra_inversion"
+                id="insatisfaccion"
                 name="motivo_retiro"
-                value="otra_inversion"
+                value="insatisfaccion"
               />
-              <label for="otra_inversion">Otra opción de inversión</label>
+              <label for="insatisfaccion">Insatisfacción</label>
             </div>
             <div>
               <input
@@ -166,8 +166,16 @@
                 value="pago_obligaciones"
               />
               <label for="pago_obligaciones"
-                >Pago de obligaciones financieras/ Tributarias</label
-              >
+                >Pago de obligaciones financieras/ Tributarias</label>
+            </div>
+            <div>
+              <input
+                type="checkbox"
+                id="otra_inversion"
+                name="motivo_retiro"
+                value="otra_inversion"
+              />
+              <label for="otra_inversion">Otra opción de inversión</label>
             </div>
           </div>
         </div>
@@ -225,8 +233,9 @@
               <option value="cc">Cédula de ciudadanía</option>
               <option value="ti">Tarjeta de identidad</option>
               <option value="ce">Cédula de extranjería</option>
-              <option value="ce">Pasaporte</option>
-              <option value="ce">Permiso Especial Permanencia</option>
+              <option value="pas">Pasaporte</option>
+              <option value="pt">Permiso Especial Permanencia</option>
+              <option value="nit">Nit</option>
             </select>
           </div>
           <div class="item-numero-id-v3">
