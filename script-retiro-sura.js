@@ -16,19 +16,19 @@ const FormValidator = {
    */
   _setupTextInputs() {
     const textInputs = document.querySelectorAll(
-      '#nombre, #patrocinadora, #beneficiario_nombre_completo, #entidad_bancaria'
+      "#nombre, #patrocinadora, #beneficiario_nombre_completo, #entidad_bancaria",
     );
-    textInputs.forEach(input => {
-      input.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '');
+    textInputs.forEach((input) => {
+      input.addEventListener("input", (e) => {
+        let value = e.target.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, "");
         value = value.toUpperCase();
         e.target.value = value;
       });
     });
 
-    const emailInput = document.querySelector('#correo');
+    const emailInput = document.querySelector("#correo");
     if (emailInput) {
-      emailInput.addEventListener('input', (e) => {
+      emailInput.addEventListener("input", (e) => {
         let value = e.target.value;
         e.target.value = value;
       });
@@ -40,11 +40,11 @@ const FormValidator = {
    */
   _setupNumericInputs() {
     const numericInputs = document.querySelectorAll(
-      '#num_documento, #telefono, #beneficiario_numero_id, #numero_cuenta_bancaria'
+      "#num_documento, #telefono, #beneficiario_numero_id, #numero_cuenta_bancaria",
     );
-    numericInputs.forEach(input => {
-      input.addEventListener('input', (e) => {
-        e.target.value = e.target.value.replace(/[^0-9]/g, '');
+    numericInputs.forEach((input) => {
+      input.addEventListener("input", (e) => {
+        e.target.value = e.target.value.replace(/[^0-9]/g, "");
       });
     });
   },
@@ -55,46 +55,46 @@ const FormValidator = {
   _setupExclusiveCheckboxes() {
     const checkboxGroups = [
       {
-        name: 'forma_retiro',
+        name: "forma_retiro",
         selectors: [
           'input[name="forma_retiro"][value="transferencia"]',
-          'input[name="forma_retiro"][value="cheque"]'
-        ]
+          'input[name="forma_retiro"][value="cheque"]',
+        ],
       },
       {
-        name: 'tipo_cuenta',
+        name: "tipo_cuenta",
         selectors: [
           'input[name="tipo_cuenta"][value="ahorro"]',
-          'input[name="tipo_cuenta"][value="corriente"]'
-        ]
+          'input[name="tipo_cuenta"][value="corriente"]',
+        ],
       },
       {
-        name: 'tipo_retiro',
+        name: "tipo_retiro",
         selectors: [
           'input[name="tipo_retiro"][value="retiro_total"]',
           'input[name="tipo_retiro"][value="traslado_afc"]',
-          'input[name="tipo_retiro"][value="traslado_voluntarios"]'
-        ]
+          'input[name="tipo_retiro"][value="traslado_voluntarios"]',
+        ],
       },
       {
-        name: 'motivo_retiro',
+        name: "motivo_retiro",
         selectors: [
           'input[name="motivo_retiro"][value="gastos_inesperados"]',
           'input[name="motivo_retiro"][value="objetivo_ahorro"]',
           'input[name="motivo_retiro"][value="compra_inmobiliaria"]',
           'input[name="motivo_retiro"][value="otra_inversion"]',
           'input[name="motivo_retiro"][value="pago_obligaciones"]',
-          'input[name="motivo_retiro"][value="insatisfaccion"]'
-        ]
-      }
+          'input[name="motivo_retiro"][value="insatisfaccion"]',
+        ],
+      },
     ];
 
-    checkboxGroups.forEach(group => {
-      const checkboxes = document.querySelectorAll(group.selectors.join(', '));
-      checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', () => {
+    checkboxGroups.forEach((group) => {
+      const checkboxes = document.querySelectorAll(group.selectors.join(", "));
+      checkboxes.forEach((checkbox) => {
+        checkbox.addEventListener("change", () => {
           if (checkbox.checked) {
-            checkboxes.forEach(other => {
+            checkboxes.forEach((other) => {
               if (other !== checkbox) {
                 other.checked = false;
               }
@@ -103,7 +103,7 @@ const FormValidator = {
         });
       });
     });
-  }
+  },
 };
 
 /**
@@ -124,7 +124,7 @@ const PdfGenerator = {
       "a[href*='PDF']",
       ".download-btn",
       ".pdf-btn",
-      "#pdfButton"
+      "#pdfButton",
     ];
 
     let button = null;
@@ -140,9 +140,9 @@ const PdfGenerator = {
         e.stopPropagation();
         this._generatePdf(e);
       });
-      if (button.href && button.href !== '#') {
-        button.setAttribute('data-original-href', button.href);
-        button.href = '#';
+      if (button.href && button.href !== "#") {
+        button.setAttribute("data-original-href", button.href);
+        button.href = "#";
       }
       console.log("PdfGenerator: Botón configurado correctamente");
     } else {
@@ -158,7 +158,7 @@ const PdfGenerator = {
     e.preventDefault();
     e.stopPropagation();
     e.stopImmediatePropagation();
-    
+
     try {
       if (!window.jspdf || !window.jspdf.jsPDF) {
         throw new Error("jsPDF no está cargado correctamente");
@@ -169,22 +169,24 @@ const PdfGenerator = {
 
       const { jsPDF } = window.jspdf;
       const pdf = new jsPDF("p", "pt", "a4");
-      
+
       this._showLoadingIndicator();
       const elementsToHide = this._prepareForCapture();
-      await new Promise(resolve => setTimeout(resolve, 100));
+      await new Promise((resolve) => setTimeout(resolve, 100));
       const canvas = await this._captureFullContent();
       this._restoreElements(elementsToHide);
       this._hideLoadingIndicator();
 
       this._addImageToPdf(pdf, canvas);
-      
-      const timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+
+      const timestamp = new Date()
+        .toISOString()
+        .slice(0, 19)
+        .replace(/:/g, "-");
       const filename = `Formato_de_Retiro_${timestamp}.pdf`;
       pdf.save(filename);
-      
+
       console.log("PDF generado exitosamente:", filename);
-      
     } catch (error) {
       this._handlePdfError(error);
     }
@@ -195,8 +197,8 @@ const PdfGenerator = {
    */
   _showLoadingIndicator() {
     this._hideLoadingIndicator();
-    const indicator = document.createElement('div');
-    indicator.id = 'pdf-loading-indicator';
+    const indicator = document.createElement("div");
+    indicator.id = "pdf-loading-indicator";
     indicator.innerHTML = `
       <div style="
         position: fixed;
@@ -244,7 +246,7 @@ const PdfGenerator = {
    * Oculta indicador de carga
    */
   _hideLoadingIndicator() {
-    const indicator = document.getElementById('pdf-loading-indicator');
+    const indicator = document.getElementById("pdf-loading-indicator");
     if (indicator) {
       indicator.remove();
     }
@@ -257,34 +259,37 @@ const PdfGenerator = {
   _prepareForCapture() {
     const elementsToHide = [];
     const selectorsToHide = [
-      '.contenedor-boton',
-      '.botón',
-      '.boton',
-      'button',
-      '.btn',
-      '.download-btn',
-      '.pdf-exclude',
-      '#pdf-loading-indicator',
-      '.no-pdf',
-      'footer',
-      '.footer'
+      ".contenedor-boton",
+      ".botón",
+      ".boton",
+      "button",
+      ".btn",
+      ".download-btn",
+      ".pdf-exclude",
+      "#pdf-loading-indicator",
+      ".no-pdf",
+      "footer",
+      ".footer",
     ];
 
-    selectorsToHide.forEach(selector => {
+    selectorsToHide.forEach((selector) => {
       try {
         const elements = document.querySelectorAll(selector);
-        elements.forEach(element => {
-          if (element && element.style.display !== 'none') {
+        elements.forEach((element) => {
+          if (element && element.style.display !== "none") {
             elementsToHide.push({
               element: element,
               originalDisplay: element.style.display,
-              originalVisibility: element.style.visibility
+              originalVisibility: element.style.visibility,
             });
-            element.style.display = 'none';
+            element.style.display = "none";
           }
         });
       } catch (error) {
-        console.warn(`Error al ocultar elementos con selector ${selector}:`, error);
+        console.warn(
+          `Error al ocultar elementos con selector ${selector}:`,
+          error,
+        );
       }
     });
 
@@ -296,14 +301,16 @@ const PdfGenerator = {
    * @param {Array} elementsToHide - Array de elementos a restaurar
    */
   _restoreElements(elementsToHide) {
-    elementsToHide.forEach(({ element, originalDisplay, originalVisibility }) => {
-      try {
-        element.style.display = originalDisplay || '';
-        element.style.visibility = originalVisibility || '';
-      } catch (error) {
-        console.warn('Error al restaurar elemento:', error);
-      }
-    });
+    elementsToHide.forEach(
+      ({ element, originalDisplay, originalVisibility }) => {
+        try {
+          element.style.display = originalDisplay || "";
+          element.style.visibility = originalVisibility || "";
+        } catch (error) {
+          console.warn("Error al restaurar elemento:", error);
+        }
+      },
+    );
   },
 
   /**
@@ -311,7 +318,7 @@ const PdfGenerator = {
    * @returns {Promise<HTMLCanvasElement>} - Canvas con la imagen
    */
   async _captureFullContent() {
-    const container = document.querySelector('.pdf-content') || document.body;
+    const container = document.querySelector(".pdf-content") || document.body;
 
     if (!container) {
       throw new Error("No se encontró el contenedor del documento");
@@ -320,14 +327,14 @@ const PdfGenerator = {
     const scrollHeight = Math.max(
       container.scrollHeight,
       container.offsetHeight,
-      container.clientHeight
+      container.clientHeight,
     );
 
     return await html2canvas(container, {
       scale: 1, // Reducir resolución
       useCORS: true,
       allowTaint: true,
-      backgroundColor: '#ffffff', // Fondo blanco para evitar transparencias
+      backgroundColor: "#ffffff", // Fondo blanco para evitar transparencias
       scrollX: 0,
       scrollY: 0,
       logging: false,
@@ -338,30 +345,30 @@ const PdfGenerator = {
       ignoreElements: (element) => {
         if (!element || !element.tagName) return false;
         const tagName = element.tagName.toLowerCase();
-        const className = element.className || '';
-        const id = element.id || '';
+        const className = element.className || "";
+        const id = element.id || "";
         return [
-          tagName === 'script',
-          tagName === 'style',
-          tagName === 'button',
-          className.includes('btn') && !className.includes('pdf-include'),
-          className.includes('boton') && !className.includes('pdf-include'),
-          className.includes('button') && !className.includes('pdf-include'),
-          className.includes('no-pdf'),
-          className.includes('pdf-exclude'),
-          className.includes('download'),
-          className.includes('contenedor-boton'),
-          id === 'pdf-loading-indicator',
-          tagName === 'footer' || className.includes('footer'),
-          element.style.display === 'none',
-          element.style.visibility === 'hidden'
-        ].some(condition => condition);
+          tagName === "script",
+          tagName === "style",
+          tagName === "button",
+          className.includes("btn") && !className.includes("pdf-include"),
+          className.includes("boton") && !className.includes("pdf-include"),
+          className.includes("button") && !className.includes("pdf-include"),
+          className.includes("no-pdf"),
+          className.includes("pdf-exclude"),
+          className.includes("download"),
+          className.includes("contenedor-boton"),
+          id === "pdf-loading-indicator",
+          tagName === "footer" || className.includes("footer"),
+          element.style.display === "none",
+          element.style.visibility === "hidden",
+        ].some((condition) => condition);
       },
       onclone: (clonedDoc, element) => {
         this._cleanClonedDocument(clonedDoc);
         this._preserveStyles(clonedDoc);
         this._preserveFormStates(clonedDoc);
-      }
+      },
     });
   },
 
@@ -369,150 +376,123 @@ const PdfGenerator = {
    * Preserva los estados de los elementos de formulario
    * @param {Document} clonedDoc - Documento clonado
    */
-  _preserveFormStates(clonedDoc) {
-    try {
-      const originalSelects = document.querySelectorAll('select');
-      const clonedSelects = clonedDoc.querySelectorAll('select');
+ _preserveFormStates(clonedDoc) {
+  try {
+    const originalSelects = document.querySelectorAll('select');
+    const clonedSelects = clonedDoc.querySelectorAll('select');
 
-      originalSelects.forEach((originalSelect, index) => {
-        if (!clonedSelects[index]) return;
+    originalSelects.forEach((originalSelect, index) => {
+      if (!clonedSelects[index]) return;
 
-        const clonedSelect = clonedSelects[index];
-        const selectedValue = originalSelect.value;
-        const selectedOption = originalSelect.options[originalSelect.selectedIndex];
+      const clonedSelect = clonedSelects[index];
+      const selectedValue = originalSelect.value;
+      const selectedOption = originalSelect.options[originalSelect.selectedIndex];
 
-        const firstOptionValue = originalSelect.options[0]?.value || '';
-        const isPlaceholder = !selectedValue
-          || selectedValue === ''
-          || selectedValue === '0'
-          || (selectedValue === firstOptionValue && originalSelect.selectedIndex === 0);
+      // Placeholder = sin valor o el primer option sin value real
+      const firstOptionValue = originalSelect.options[0]?.value || '';
+      const isPlaceholder = !selectedValue 
+        || selectedValue === '' 
+        || selectedValue === '0'
+        || selectedValue === firstOptionValue && originalSelect.selectedIndex === 0;
 
-        let selectedText = '';
-        if (!isPlaceholder) {
-          selectedText = selectedOption?.text || selectedOption?.textContent || '';
-          selectedText = selectedText.trim().replace(/\s+/g, ' ');
-        } else {
-          const selectId = originalSelect.id || originalSelect.name;
-          if (selectId) {
-            const labelEl = clonedDoc.querySelector(`label[for="${selectId}"]`);
-            if (labelEl) {
-              selectedText = labelEl.textContent.trim().replace(/\s+/g, ' ');
-            }
-          }
-          if (!selectedText) {
-            selectedText = originalSelect.getAttribute('data-label')
-              || originalSelect.getAttribute('aria-label')
-              || '';
+      let selectedText = '';
+      if (!isPlaceholder) {
+        selectedText = selectedOption?.text || selectedOption?.textContent || '';
+        selectedText = selectedText.trim().replace(/\s+/g, ' ');
+      } else {
+        // Busca el label en el documento CLONADO (no en document)
+        const selectId = originalSelect.id || originalSelect.name;
+        if (selectId) {
+          const labelEl = clonedDoc.querySelector(`label[for="${selectId}"]`);
+          if (labelEl) {
+            selectedText = labelEl.textContent.trim().replace(/\s+/g, ' ');
           }
         }
-
-        const selectedTextUpper = selectedText.toUpperCase();
-
-        clonedSelect.value = selectedValue;
-        Array.from(clonedSelect.options).forEach(option => {
-          option.selected = option.value === selectedValue;
-          const optionText = (option.textContent || option.text || '').trim().replace(/\s+/g, ' ');
-          option.textContent = optionText.toUpperCase();
-          option.text = optionText.toUpperCase();
-        });
-
-        const displaySpan = clonedDoc.createElement('span');
-        displaySpan.textContent = selectedTextUpper;
-        const originalStyles = window.getComputedStyle(originalSelect);
-
-        displaySpan.style.cssText = `
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          display: flex;
-          align-items: center;
-          padding-left: 8px;
-          background: ${originalStyles.backgroundColor || 'white'};
-          border: ${originalStyles.border || '1px solid #ccc'};
-          font-family: ${originalStyles.fontFamily || '"Sofia Sans", sans-serif'};
-          font-size: ${originalStyles.fontSize || 'inherit'};
-          font-weight: ${originalStyles.fontWeight || 'inherit'};
-          color: ${originalStyles.color || 'inherit'},
-          pointer-events: none;
-          z-index: 1;
-          text-transform: uppercase;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          line-height: normal;
-          word-spacing: normal;
-          letter-spacing: normal;
-        `;
-
-        clonedSelect.style.opacity = '0';
-        clonedSelect.style.position = 'relative';
-        if (isPlaceholder) {
-          clonedSelect.style.display = 'none';
+        if (!selectedText) {
+          selectedText = originalSelect.getAttribute('data-label')
+            || originalSelect.getAttribute('aria-label')
+            || '';
         }
+      }
 
-        if (clonedSelect.parentNode) {
-          clonedSelect.parentNode.style.position = 'relative';
-          clonedSelect.parentNode.insertBefore(displaySpan, clonedSelect.nextSibling);
-        }
+      const selectedTextUpper = selectedText.toUpperCase();
+
+      // Sincroniza opciones en el clon
+      clonedSelect.value = selectedValue;
+      Array.from(clonedSelect.options).forEach(option => {
+        option.selected = option.value === selectedValue;
+        const optionText = (option.textContent || option.text || '').trim().replace(/\s+/g, ' ');
+        option.textContent = optionText.toUpperCase();
+        option.text = optionText.toUpperCase();
       });
 
-      const originalInputs = document.querySelectorAll('input');
-      const clonedInputs = clonedDoc.querySelectorAll('input');
-      
-      originalInputs.forEach((originalInput, index) => {
-        if (clonedInputs[index]) {
-          const clonedInput = clonedInputs[index];
-          
-          if (originalInput.type === 'checkbox' || originalInput.type === 'radio') {
-            clonedInput.checked = originalInput.checked;
-          } else if (originalInput.type === 'date') {
-            clonedInput.value = originalInput.value;
-          } else {
-            let cleanValue = originalInput.value.trim().replace(/\s+/g, ' ');
-            const isNumeric = ['num_documento', 'telefono', 'beneficiario_numero_id', 'numero_cuenta_bancaria'].includes(originalInput.id);
-            const isEmail = originalInput.id === 'correo';
-            if (!isNumeric && !isEmail) {
-              cleanValue = cleanValue.toUpperCase();
-            }
-            clonedInput.value = cleanValue;
-            
-            const originalStyles = window.getComputedStyle(originalInput);
-            clonedInput.style.fontFamily = originalStyles.fontFamily || '"Sofia Sans", sans-serif';
-            clonedInput.style.fontSize = originalStyles.fontSize;
-            clonedInput.style.fontWeight = originalStyles.fontWeight;
-            clonedInput.style.wordSpacing = 'normal';
-            clonedInput.style.letterSpacing = 'normal';
-            if (!isNumeric && !isEmail) {
-              clonedInput.style.textTransform = 'uppercase';
-            }
-          }
-        }
-      });
+      // Crea el span de reemplazo visual
+      const displaySpan = clonedDoc.createElement('span');
+      displaySpan.textContent = selectedTextUpper;
+      const originalStyles = window.getComputedStyle(originalSelect);
 
-      const originalTextareas = document.querySelectorAll('textarea');
-      const clonedTextareas = clonedDoc.querySelectorAll('textarea');
-      
+      displaySpan.style.cssText = `
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        padding-left: 8px;
+        background: ${originalStyles.backgroundColor || 'white'};
+        border: ${originalStyles.border || '1px solid #ccc'};
+        font-family: ${originalStyles.fontFamily || '"Sofia Sans", sans-serif'};
+        font-size: ${originalStyles.fontSize || 'inherit'};
+        font-weight: ${originalStyles.fontWeight || 'inherit'};
+        color: ${isPlaceholder ? '#888' : (originalStyles.color || 'inherit')};
+        pointer-events: none;
+        z-index: 1;
+        text-transform: uppercase;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: normal;
+        word-spacing: normal;
+        letter-spacing: normal;
+      `;
+
+      // Oculta el select nativo en el clon
+      clonedSelect.style.opacity = '0';
+      clonedSelect.style.position = 'relative';
+      if (isPlaceholder) {
+        clonedSelect.style.display = 'none';
+      }
+
+      // Inserta el span SOLO dentro del wrapper del select, no del label
+      if (clonedSelect.parentNode) {
+        clonedSelect.parentNode.style.position = 'relative';
+        clonedSelect.parentNode.insertBefore(displaySpan, clonedSelect.nextSibling);
+      }
+    });
+
+      const originalTextareas = document.querySelectorAll("textarea");
+      const clonedTextareas = clonedDoc.querySelectorAll("textarea");
+
       originalTextareas.forEach((originalTextarea, index) => {
         if (clonedTextareas[index]) {
-          const cleanValue = originalTextarea.value.trim().replace(/\s+/g, ' ');
+          const cleanValue = originalTextarea.value.trim().replace(/\s+/g, " ");
           const upperValue = cleanValue.toUpperCase();
           clonedTextareas[index].value = upperValue;
           clonedTextareas[index].textContent = upperValue;
-          
+
           const originalStyles = window.getComputedStyle(originalTextarea);
-          clonedTextareas[index].style.textTransform = 'uppercase';
-          clonedTextareas[index].style.fontFamily = originalStyles.fontFamily || '"Sofia Sans", sans-serif';
+          clonedTextareas[index].style.textTransform = "uppercase";
+          clonedTextareas[index].style.fontFamily =
+            originalStyles.fontFamily || '"Sofia Sans", sans-serif';
           clonedTextareas[index].style.fontSize = originalStyles.fontSize;
           clonedTextareas[index].style.fontWeight = originalStyles.fontWeight;
-          clonedTextareas[index].style.wordSpacing = 'normal';
-          clonedTextareas[index].style.letterSpacing = 'normal';
+          clonedTextareas[index].style.wordSpacing = "normal";
+          clonedTextareas[index].style.letterSpacing = "normal";
         }
       });
-
     } catch (error) {
-      console.warn('Error al preservar estados de formulario:', error);
+      console.warn("Error al preservar estados de formulario:", error);
     }
   },
 
@@ -522,25 +502,25 @@ const PdfGenerator = {
    */
   _cleanClonedDocument(clonedDoc) {
     const selectorsToRemove = [
-      'button',
-      '.btn:not(.pdf-include)',
-      '.botón:not(.pdf-include)',
-      '.boton:not(.pdf-include)',
-      '.contenedor-boton',
-      '.no-pdf',
-      '.pdf-exclude',
-      '.download-btn',
-      'script',
-      'style:not([data-styled]):not([data-emotion])',
-      '#pdf-loading-indicator',
-      'footer',
-      '.footer'
+      "button",
+      ".btn:not(.pdf-include)",
+      ".botón:not(.pdf-include)",
+      ".boton:not(.pdf-include)",
+      ".contenedor-boton",
+      ".no-pdf",
+      ".pdf-exclude",
+      ".download-btn",
+      "script",
+      "style:not([data-styled]):not([data-emotion])",
+      "#pdf-loading-indicator",
+      "footer",
+      ".footer",
     ];
 
-    selectorsToRemove.forEach(selector => {
+    selectorsToRemove.forEach((selector) => {
       try {
         const elements = clonedDoc.querySelectorAll(selector);
-        elements.forEach(element => {
+        elements.forEach((element) => {
           if (element && element.parentNode) {
             element.parentNode.removeChild(element);
           }
@@ -552,21 +532,21 @@ const PdfGenerator = {
 
     try {
       const gridElements = clonedDoc.querySelectorAll(
-        '.grid_retiro_traslado, .item-tipo-retiro, .item-patrocinadora'
+        ".grid_retiro_traslado, .item-tipo-retiro, .item-patrocinadora",
       );
-      gridElements.forEach(element => {
-        element.style.border = 'none';
-        element.style.borderTop = 'none';
-        element.style.borderBottom = 'none';
-        element.style.boxShadow = 'none';
-        element.style.outline = 'none';
-        element.style.background = 'transparent';
-        element.style.setProperty('content', 'none', 'important');
-        element.style.setProperty('::before', 'none', 'important');
-        element.style.setProperty('::after', 'none', 'important');
+      gridElements.forEach((element) => {
+        element.style.border = "none";
+        element.style.borderTop = "none";
+        element.style.borderBottom = "none";
+        element.style.boxShadow = "none";
+        element.style.outline = "none";
+        element.style.background = "transparent";
+        element.style.setProperty("content", "none", "important");
+        element.style.setProperty("::before", "none", "important");
+        element.style.setProperty("::after", "none", "important");
       });
     } catch (error) {
-      console.warn('Error al limpiar estilos en grid_retiro_traslado:', error);
+      console.warn("Error al limpiar estilos en grid_retiro_traslado:", error);
     }
   },
 
@@ -576,39 +556,50 @@ const PdfGenerator = {
    */
   _preserveStyles(clonedDoc) {
     try {
-      const allElements = clonedDoc.querySelectorAll('*');
-      allElements.forEach(el => {
+      const allElements = clonedDoc.querySelectorAll("*");
+      allElements.forEach((el) => {
         try {
           const originalEl = this._findOriginalElement(el);
           if (originalEl) {
             const computedStyle = window.getComputedStyle(originalEl);
-            if (computedStyle.fontFamily) el.style.fontFamily = computedStyle.fontFamily;
-            if (computedStyle.fontSize) el.style.fontSize = computedStyle.fontSize;
-            if (computedStyle.fontWeight) el.style.fontWeight = computedStyle.fontWeight;
+            if (computedStyle.fontFamily)
+              el.style.fontFamily = computedStyle.fontFamily;
+            if (computedStyle.fontSize)
+              el.style.fontSize = computedStyle.fontSize;
+            if (computedStyle.fontWeight)
+              el.style.fontWeight = computedStyle.fontWeight;
             if (computedStyle.color) el.style.color = computedStyle.color;
-            if (computedStyle.wordSpacing) el.style.wordSpacing = computedStyle.wordSpacing;
-            if (computedStyle.letterSpacing) el.style.letterSpacing = computedStyle.letterSpacing;
-            if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+            if (computedStyle.wordSpacing)
+              el.style.wordSpacing = computedStyle.wordSpacing;
+            if (computedStyle.letterSpacing)
+              el.style.letterSpacing = computedStyle.letterSpacing;
+            if (
+              computedStyle.backgroundColor &&
+              computedStyle.backgroundColor !== "rgba(0, 0, 0, 0)"
+            ) {
               el.style.backgroundColor = computedStyle.backgroundColor;
             }
-            if (computedStyle.backgroundImage && computedStyle.backgroundImage !== 'none') {
+            if (
+              computedStyle.backgroundImage &&
+              computedStyle.backgroundImage !== "none"
+            ) {
               el.style.backgroundImage = computedStyle.backgroundImage;
               el.style.backgroundSize = computedStyle.backgroundSize;
               el.style.backgroundPosition = computedStyle.backgroundPosition;
               el.style.backgroundRepeat = computedStyle.backgroundRepeat;
             }
-            if (computedStyle.border && computedStyle.border !== 'none') {
+            if (computedStyle.border && computedStyle.border !== "none") {
               el.style.border = computedStyle.border;
             }
-            if (el.tagName.toLowerCase() === 'img') {
-              el.style.maxWidth = computedStyle.maxWidth || '100%';
-              el.style.height = computedStyle.height || 'auto';
+            if (el.tagName.toLowerCase() === "img") {
+              el.style.maxWidth = computedStyle.maxWidth || "100%";
+              el.style.height = computedStyle.height || "auto";
             }
           }
         } catch (error) {}
       });
     } catch (error) {
-      console.warn('Error al preservar estilos:', error);
+      console.warn("Error al preservar estilos:", error);
     }
   },
 
@@ -623,7 +614,9 @@ const PdfGenerator = {
         return document.getElementById(clonedElement.id);
       }
       if (clonedElement.className) {
-        const elements = document.getElementsByClassName(clonedElement.className);
+        const elements = document.getElementsByClassName(
+          clonedElement.className,
+        );
         if (elements.length === 1) return elements[0];
       }
       return null;
@@ -642,8 +635,8 @@ const PdfGenerator = {
     const pdfWidth = pdf.internal.pageSize.getWidth();
     const pdfHeight = pdf.internal.pageSize.getHeight();
     const margin = 5; // Reducir márgenes
-    const maxWidth = pdfWidth - (margin * 2);
-    const maxHeight = pdfHeight - (margin * 2);
+    const maxWidth = pdfWidth - margin * 2;
+    const maxHeight = pdfHeight - margin * 2;
     const scaleX = maxWidth / canvas.width;
     const scaleY = maxHeight / canvas.height;
     const scale = Math.min(scaleX, scaleY, 1.0);
@@ -653,7 +646,15 @@ const PdfGenerator = {
     const yPos = margin;
 
     if (imgHeight > maxHeight) {
-      this._addMultiPageImage(pdf, imageData, canvas, imgWidth, maxHeight, xPos, margin);
+      this._addMultiPageImage(
+        pdf,
+        imageData,
+        canvas,
+        imgWidth,
+        maxHeight,
+        xPos,
+        margin,
+      );
     } else {
       pdf.addImage(imageData, "JPEG", xPos, yPos, imgWidth, imgHeight);
     }
@@ -669,29 +670,54 @@ const PdfGenerator = {
    * @param {number} xPos - Posición X
    * @param {number} margin - Margen
    */
-  _addMultiPageImage(pdf, imageData, canvas, imgWidth, maxHeight, xPos, margin) {
+  _addMultiPageImage(
+    pdf,
+    imageData,
+    canvas,
+    imgWidth,
+    maxHeight,
+    xPos,
+    margin,
+  ) {
     const scale = imgWidth / canvas.width;
     let currentY = 0;
     let pageCount = 0;
-    
+
     while (currentY < canvas.height) {
       if (pageCount > 0) pdf.addPage();
-      
+
       const remainingHeight = canvas.height - currentY;
       const sliceHeight = Math.min(remainingHeight, maxHeight / scale);
-      
-      const tempCanvas = document.createElement('canvas');
-      const tempCtx = tempCanvas.getContext('2d');
+
+      const tempCanvas = document.createElement("canvas");
+      const tempCtx = tempCanvas.getContext("2d");
       tempCanvas.width = canvas.width;
       tempCanvas.height = sliceHeight;
-      
-      tempCtx.drawImage(canvas, 0, currentY, canvas.width, sliceHeight, 0, 0, canvas.width, sliceHeight);
-      
+
+      tempCtx.drawImage(
+        canvas,
+        0,
+        currentY,
+        canvas.width,
+        sliceHeight,
+        0,
+        0,
+        canvas.width,
+        sliceHeight,
+      );
+
       const sliceImageData = tempCanvas.toDataURL("image/jpeg", 0.7); // Usar JPEG
       const sliceImgHeight = sliceHeight * scale;
-      
-      pdf.addImage(sliceImageData, "JPEG", xPos, margin, imgWidth, sliceImgHeight);
-      
+
+      pdf.addImage(
+        sliceImageData,
+        "JPEG",
+        xPos,
+        margin,
+        imgWidth,
+        sliceImgHeight,
+      );
+
       currentY += sliceHeight;
       pageCount++;
     }
@@ -705,22 +731,22 @@ const PdfGenerator = {
     console.error("Error al generar PDF:", error);
     this._hideLoadingIndicator();
     let errorMessage = "Error al generar el PDF. ";
-    if (error.message.includes('jsPDF')) {
+    if (error.message.includes("jsPDF")) {
       errorMessage += "La librería jsPDF no está disponible.";
-    } else if (error.message.includes('html2canvas')) {
+    } else if (error.message.includes("html2canvas")) {
       errorMessage += "La librería html2canvas no está disponible.";
-    } else if (error.message.includes('contenedor')) {
+    } else if (error.message.includes("contenedor")) {
       errorMessage += "No se encontró el contenido del documento.";
     } else {
       errorMessage += "Por favor, intenta nuevamente.";
     }
     alert(errorMessage);
-  }
+  },
 };
 
 // Inicializar cuando el DOM esté listo
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", () => {
     PdfGenerator.setup();
   });
 } else {
