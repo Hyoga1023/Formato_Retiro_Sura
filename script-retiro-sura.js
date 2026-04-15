@@ -20,7 +20,7 @@ const FormValidator = {
     );
     textInputs.forEach(input => {
       input.addEventListener('input', (e) => {
-        let value = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+        let value = e.target.value.replace(/[^a-zA-ZñÑáéíóúÁÉÍÓÚ\s]/g, '');
         value = value.toUpperCase();
         e.target.value = value;
       });
@@ -373,62 +373,88 @@ const PdfGenerator = {
     try {
       const originalSelects = document.querySelectorAll('select');
       const clonedSelects = clonedDoc.querySelectorAll('select');
-      
+
       originalSelects.forEach((originalSelect, index) => {
-        if (clonedSelects[index]) {
-          const clonedSelect = clonedSelects[index];
-          const selectedValue = originalSelect.value;
-          const selectedOption = originalSelect.options[originalSelect.selectedIndex];
-          
-          let selectedText = selectedOption?.text || selectedOption?.textContent || '';
+        if (!clonedSelects[index]) return;
+
+        const clonedSelect = clonedSelects[index];
+        const selectedValue = originalSelect.value;
+        const selectedOption = originalSelect.options[originalSelect.selectedIndex];
+
+        const firstOptionValue = originalSelect.options[0]?.value || '';
+        const isPlaceholder = !selectedValue
+          || selectedValue === ''
+          || selectedValue === '0'
+          || (selectedValue === firstOptionValue && originalSelect.selectedIndex === 0);
+
+        let selectedText = '';
+        if (!isPlaceholder) {
+          selectedText = selectedOption?.text || selectedOption?.textContent || '';
           selectedText = selectedText.trim().replace(/\s+/g, ' ');
-          const selectedTextUpper = selectedText.toUpperCase();
-          
-          clonedSelect.value = selectedValue;
-          Array.from(clonedSelect.options).forEach(option => {
-            option.selected = option.value === selectedValue;
-            const optionText = (option.textContent || option.text || '').trim().replace(/\s+/g, ' ');
-            option.textContent = optionText.toUpperCase();
-            option.text = optionText.toUpperCase();
-          });
-          
-          const displaySpan = clonedDoc.createElement('span');
-          displaySpan.textContent = selectedTextUpper;
-          const originalStyles = window.getComputedStyle(originalSelect);
-          
-          displaySpan.style.cssText = `
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            padding-left: 8px;
-            background: ${originalStyles.backgroundColor || 'white'};
-            border: ${originalStyles.border || '1px solid #ccc'};
-            font-family: ${originalStyles.fontFamily || '"Sofia Sans", sans-serif'};
-            font-size: ${originalStyles.fontSize || 'inherit'};
-            font-weight: ${originalStyles.fontWeight || 'inherit'};
-            color: ${originalStyles.color || 'inherit'};
-            pointer-events: none;
-            z-index: 1;
-            text-transform: uppercase;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            line-height: normal;
-            word-spacing: normal;
-            letter-spacing: normal;
-          `;
-          
-          clonedSelect.style.opacity = '0';
-          clonedSelect.style.position = 'relative';
-          
-          if (clonedSelect.parentNode) {
-            clonedSelect.parentNode.style.position = 'relative';
-            clonedSelect.parentNode.insertBefore(displaySpan, clonedSelect.nextSibling);
+        } else {
+          const selectId = originalSelect.id || originalSelect.name;
+          if (selectId) {
+            const labelEl = clonedDoc.querySelector(`label[for="${selectId}"]`);
+            if (labelEl) {
+              selectedText = labelEl.textContent.trim().replace(/\s+/g, ' ');
+            }
           }
+          if (!selectedText) {
+            selectedText = originalSelect.getAttribute('data-label')
+              || originalSelect.getAttribute('aria-label')
+              || '';
+          }
+        }
+
+        const selectedTextUpper = selectedText.toUpperCase();
+
+        clonedSelect.value = selectedValue;
+        Array.from(clonedSelect.options).forEach(option => {
+          option.selected = option.value === selectedValue;
+          const optionText = (option.textContent || option.text || '').trim().replace(/\s+/g, ' ');
+          option.textContent = optionText.toUpperCase();
+          option.text = optionText.toUpperCase();
+        });
+
+        const displaySpan = clonedDoc.createElement('span');
+        displaySpan.textContent = selectedTextUpper;
+        const originalStyles = window.getComputedStyle(originalSelect);
+
+        displaySpan.style.cssText = `
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          display: flex;
+          align-items: center;
+          padding-left: 8px;
+          background: ${originalStyles.backgroundColor || 'white'};
+          border: ${originalStyles.border || '1px solid #ccc'};
+          font-family: ${originalStyles.fontFamily || '"Sofia Sans", sans-serif'};
+          font-size: ${originalStyles.fontSize || 'inherit'};
+          font-weight: ${originalStyles.fontWeight || 'inherit'};
+          color: ${originalStyles.color || 'inherit'},
+          pointer-events: none;
+          z-index: 1;
+          text-transform: uppercase;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          line-height: normal;
+          word-spacing: normal;
+          letter-spacing: normal;
+        `;
+
+        clonedSelect.style.opacity = '0';
+        clonedSelect.style.position = 'relative';
+        if (isPlaceholder) {
+          clonedSelect.style.display = 'none';
+        }
+
+        if (clonedSelect.parentNode) {
+          clonedSelect.parentNode.style.position = 'relative';
+          clonedSelect.parentNode.insertBefore(displaySpan, clonedSelect.nextSibling);
         }
       });
 
