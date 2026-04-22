@@ -445,7 +445,7 @@ const PdfGenerator = {
         font-family: ${originalStyles.fontFamily || '"Sofia Sans", sans-serif'};
         font-size: ${originalStyles.fontSize || 'inherit'};
         font-weight: ${originalStyles.fontWeight || 'inherit'};
-        color: ${isPlaceholder ? '#888' : (originalStyles.color || 'inherit')};
+        color: #000;
         pointer-events: none;
         z-index: 1;
         text-transform: uppercase;
